@@ -15,6 +15,7 @@ filepath = ""
 
 def resize(imgpath:str, resize_w:int, resize_h:int, changeBG=True):
     image_name = imgpath.split("\\")[-1].split(".")[0]
+    
     origin_img = cv.imread(imgpath)
     # replace the iamge white background to #d2efd3
     if changeBG:
@@ -48,23 +49,30 @@ def processExcel():
     else:
         messagebox.showerror(title="錯誤", message="請選擇檔案類型")
 
-#  #ffffff #d2efd3 #cdd6cd
+def getIcon(img_path):
+    img = Image.open(img_path)
+    icon = ImageTk.PhotoImage(img) 
+    return icon
+    
 
 bgcolor = "#d2efd3"
 
+# set windows size
+windows_w = 500
+windows_h = 400
+
 root = Tk()
 font = Font(family="微軟正黑體", size=12)
-root.geometry("500x400+800+300")
+root.geometry(f"{str(windows_w)}x{str(windows_h)}+800+300")
 root.resizable(width=0, height=0)
 root.attributes('-alpha', 1)
 
 
 root.title("Excel Filter Tool")
 
-# set icon
-iconimg = Image.open('D:\\GUI\\Test\\icon.jpg')
-icon = ImageTk.PhotoImage(iconimg) 
-root.iconphoto(True, icon)
+# set icon.
+iconimg = getIcon('D:\\GUI\\Test\\icon.jpg')
+root.iconphoto(True, iconimg)
 root.configure(bg=bgcolor)
 
 greet = Label(root, text="選擇檔案類型", height="3", bg=bgcolor, font=font)
@@ -72,13 +80,12 @@ greet.pack()
 
 # read the img and set the img at right down
 origin_img_path = resize('D:\\GUI\\Test\\456.jpg', resize_w=100, resize_h=100, changeBG=True)
-img2 = Image.open(origin_img_path)
-icon2 = ImageTk.PhotoImage(img2) 
-width = icon2.width()
-height = icon2.height()
+decoration = getIcon(origin_img_path)
+width = decoration.width()
+height = decoration.height()
 
-pikachu = Label(root, image=icon2)
-pikachu.place(x=500-width, y=400-height)
+pikachu = Label(root, image=decoration)
+pikachu.place(x=windows_w-width, y=windows_h-height)
 
 # options list
 options = ['代謝症候群','選項2','選項3','選項4','選項5', '選項6', '選項7', '選項8', '選項9', '選項10', '選項11']
