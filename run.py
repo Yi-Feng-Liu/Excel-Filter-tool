@@ -21,7 +21,7 @@ def openFile():
         # messagebox.showinfo(title="通知", message="選擇成功")
         comfirm_button["state"] = "active"
     else:
-        label.config(text=f'無選取檔案')
+        label.config(text=f'沒有選取的檔案!')
         comfirm_button["state"] = "disabled"
     
 
