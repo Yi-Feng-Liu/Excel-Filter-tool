@@ -1,17 +1,14 @@
 from tkinter import *
+import tkinter as tk
 from PIL import Image, ImageTk 
 import cv2 as cv
 from tkinter import filedialog, messagebox
 from tkinter.font import Font
-import openpyxl
-import pandas as pd
+import threading
 from tkinter import ttk
 import numpy as np
-
-
-global filepath
-filepath = ""
-
+from process import Judge_Metabolic_Syndrome
+import time
 
 def resize(imgpath:str, resize_w:int, resize_h:int, changeBG=True):
     image_name = imgpath.split("\\")[-1].split(".")[0]
@@ -25,27 +22,30 @@ def resize(imgpath:str, resize_w:int, resize_h:int, changeBG=True):
     cv.imwrite(save_path, resize_img)
     return save_path
 
-
 def finishInfo():
-    messagebox.showinfo(title="通知", message="已篩選完成")
+    messagebox.showinfo(title="通知", message="OK")
 
 def openFile():
+    global filepath
     filepath = filedialog.askopenfilename(title="選擇檔案", filetypes=[("Excel files", ".xlsx .xls")])
-    
-    if (filepath):
+
+    if filepath:
         label.config(text=f'選取的檔案路徑為\n\n {filepath}')
-        # messagebox.showinfo(title="通知", message="選擇成功")
         comfirm_button["state"] = "active"
     else:
         label.config(text=f'沒有選取的檔案!')
         comfirm_button["state"] = "disabled"
-    
 
 def processExcel():
     types = box.get()
-    if (types):
-        print(types)
+    if types == options[0]:
+        processing_label = ttk.Label(text="處理中...", foreground="red", font=(16))
+        t = threading.Thread(target=Judge_Metabolic_Syndrome().process_Metabolic_Syndrome(filepath))
+        t.start()
+        processing_label.place(relx=0.5, rely=0.85, anchor="center")
+        processing_label.destroy() 
         finishInfo()
+
     else:
         messagebox.showerror(title="錯誤", message="請選擇檔案類型")
 
@@ -108,5 +108,4 @@ comfirm_button_img = ImageTk.PhotoImage(button_img)
 comfirm_button = Button(root, text="確認", command=processExcel, image=comfirm_button_img)
 comfirm_button.pack(pady=10)
 comfirm_button["state"] = "disabled"
-
 root.mainloop()
