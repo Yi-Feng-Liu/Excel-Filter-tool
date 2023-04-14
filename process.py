@@ -206,8 +206,12 @@ class Judge_Metabolic_Syndrome:
         
         df.to_excel(writer, sheet_name='工作表1', index=False)
         writer.close()        
-        
         self.copy_format_from_sheet1(io=io)
     
 
-# Judge_Metabolic_Syndrome().process_Metabolic_Syndrome('111.xlsx')
+def main():
+    Judge_Metabolic_Syndrome().process_Metabolic_Syndrome('111.xlsx')
+    print("Finish")
+
+if __name__ == '__main__':
+    main()
