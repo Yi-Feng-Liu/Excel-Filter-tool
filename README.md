@@ -2,7 +2,8 @@
 
 The tool used to filter excel file and will create the new worksheet that you need to key in second entry. 
 On the GUI, the sheet 1 means you want to process sheet and the sheet 2 is means what name of sheet you want to save. 
-If name of sheet 2 is not exist, it will be auto created and save it. The combobox you can select the type which you want to filter.
+
+### **If name of sheet 2 is not exist, it will be auto created and save it. The combobox you can select the type which you want to filter.**
 
 # Method
 

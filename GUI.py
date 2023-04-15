@@ -30,7 +30,7 @@ class Excel_GUI:
         self.resizable = root.resizable(width=0, height=0)
         self.attributes = root.attributes('-alpha', 1)
         # set greet label at the top
-        self.greet = Label(root, text="選擇檔案類型", height="3", bg=self.bgcolor, font=self.font)
+        self.greet = Label(root, text="選擇判斷類型", height="3", bg=self.bgcolor, font=self.font)
         self.greet.pack()
 
         # set the app icon
@@ -126,7 +126,7 @@ class Excel_GUI:
                 processing_label = ttk.Label(text="處理中...", foreground="red", font=(16))
                 t = threading.Thread(target=JMS.process_Metabolic_Syndrome(filepath, src_worksheet=process_sheet, dst_worksheet=save_sheet))
                 t.start()
-                processing_label.place(relx=0.5, rely=0.85, anchor="center")
+                processing_label.place(x=250, y=295, anchor="center")
                 processing_label.destroy() 
                 self.finishInfo()
 
@@ -146,4 +146,7 @@ class Excel_GUI:
 
     
  
-
+import tkinter as tk
+root = tk.Tk()
+Excel_GUI(root)
+root.mainloop() 

@@ -19,7 +19,6 @@ class Judge_Metabolic_Syndrome:
         self.metabolic_syndrome_column = [5, 9, 10, 11, 12, 14, 15]
         self.fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
         self.font = Font(color='FF0000')
-        self.over_standard_cut = 0
 
     def change_date_time(self, worksheet, number_of_column):
         """Remove hours:minute:second format of the datetime 
@@ -92,49 +91,49 @@ class Judge_Metabolic_Syndrome:
             glucose = row[self.metabolic_syndrome_column[4]]
             triglycerides = row[self.metabolic_syndrome_column[5]]
             hdlc = row[self.metabolic_syndrome_column[6]]
-            
+            over_standard_cnt = 0
             if gender.value == '男':
                 if waistline.value >= self.standard_waistline:
                     self.change_font_color_format(waistline)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if systolic.value >= self.standard_systolic_blood_pressure:
                     self.change_font_color_format(systolic)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if diastolic.value >= self.standard_diastolic_blood_pressure:
                     self.change_font_color_format(diastolic)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if glucose.value >= self.standard_glucose:
                     self.change_font_color_format(glucose)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if triglycerides.value >= self.standard_triglycerides:
                     self.change_font_color_format(triglycerides)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if hdlc.value < self.hdlc:
                     self.change_font_color_format(hdlc)
-                    self.over_standard_cut += 1
-                if self.over_standard_cut >= 3:
+                    over_standard_cnt += 1
+                if over_standard_cnt >= 3:
                     self.change_font_color_format(people_name, fill_cell=False)
 
             elif gender.value == '女':
                 if waistline.value >= self.standard_waistline-10:
                     self.change_font_color_format(waistline)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if systolic.value >= self.standard_systolic_blood_pressure:
                     self.change_font_color_format(systolic)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if diastolic.value >= self.standard_diastolic_blood_pressure:
                     self.change_font_color_format(diastolic)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if glucose.value >= self.standard_glucose:
                     self.change_font_color_format(glucose)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if triglycerides.value >= self.standard_triglycerides:
                     self.change_font_color_format(triglycerides)
-                    self.over_standard_cut += 1
+                    over_standard_cnt += 1
                 if hdlc.value < self.hdlc+10:
                     self.change_font_color_format(hdlc)
-                    self.over_standard_cut += 1
-                if self.over_standard_cut >= 3:
+                    over_standard_cnt += 1
+                if over_standard_cnt >= 3:
                     self.change_font_color_format(people_name, fill_cell=False)
         return worksheet
     
@@ -198,36 +197,36 @@ class Judge_Metabolic_Syndrome:
             glucose = df.iloc[i,self.metabolic_syndrome_column[4]]
             triglycerides = df.iloc[i,self.metabolic_syndrome_column[5]]
             hdlc = df.iloc[i,self.metabolic_syndrome_column[6]]
-            
+            over_standard_cnt = 0
             if gender == '男':
                 if waistline >= self.standard_waistline:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if systolic >= self.standard_systolic_blood_pressure:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if diastolic >= self.standard_diastolic_blood_pressure:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if glucose >= self.standard_glucose:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if triglycerides >= self.standard_triglycerides:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if hdlc < self.hdlc:
-                    self.over_standard_cnt += 1
-                df.iloc[i, len(df.columns)-1] = self.over_standard_cnt
+                    over_standard_cnt += 1
+                df.iloc[i, len(df.columns)-1] = over_standard_cnt
                 
             elif gender == '女':
                 if waistline >= self.standard_waistline-10:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if systolic >= self.standard_systolic_blood_pressure:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if diastolic >= self.standard_diastolic_blood_pressure:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if glucose >= self.standard_glucose:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if triglycerides >= self.standard_triglycerides:
-                    self.over_standard_cnt += 1
+                    over_standard_cnt += 1
                 if hdlc < self.hdlc+10:
-                    self.over_standard_cnt += 1              
-                df.iloc[i, len(df.columns)-1] = self.over_standard_cnt
+                    over_standard_cnt += 1              
+                df.iloc[i, len(df.columns)-1] = over_standard_cnt
 
         for i in range(len(df['超過標準數'])):
             if df['超過標準數'][i] < 3:
@@ -239,15 +238,13 @@ class Judge_Metabolic_Syndrome:
         
         df.to_excel(writer, sheet_name=dst_worksheet, index=False)
         writer.close() 
-        return io, src_worksheet, dst_worksheet
+        
+        self.copy_format_from_sheet1(io=io, src_worksheet=src_worksheet, dst_worksheet=dst_worksheet)
 
-    def main_processdure(self, io, src_worksheet, dst_worksheet):
-        filepath, original_sheet, save_sheet = self.process_Metabolic_Syndrome(io=io, src_worksheet=src_worksheet, dst_worksheet=dst_worksheet)
-        self.copy_format_from_sheet1(io=filepath, src_worksheet=original_sheet, dst_worksheet=save_sheet)
-    
+
 
 def main():
-    Judge_Metabolic_Syndrome().main_processdure('111.xlsx', src_worksheet='健檢資料', dst_worksheet='工作表1')
+    Judge_Metabolic_Syndrome().process_Metabolic_Syndrome('111.xlsx', src_worksheet='健檢資料', dst_worksheet='工作表1')
     print("Finish")
 
 if __name__ == '__main__':
