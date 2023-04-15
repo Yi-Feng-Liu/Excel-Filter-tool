@@ -4,10 +4,11 @@ from openpyxl.styles import Font, PatternFill
 from openpyxl.styles import Alignment, numbers
 import copy
 import time
+import threading
 
 
 class Judge_Metabolic_Syndrome:
-    def __init__(self) -> None:
+    def __init__(self):
         self.standard_waistline = 90
         self.standard_systolic_blood_pressure = 130
         self.standard_diastolic_blood_pressure = 85
@@ -16,6 +17,9 @@ class Judge_Metabolic_Syndrome:
         self.hdlc = 40
         self.red_font = Font(color='FF0000')
         self.metabolic_syndrome_column = [5, 9, 10, 11, 12, 14, 15]
+        self.fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
+        self.font = Font(color='FF0000')
+        self.over_standard_cut = 0
 
     def change_date_time(self, worksheet, number_of_column):
         """Remove hours:minute:second format of the datetime 
@@ -50,23 +54,37 @@ class Judge_Metabolic_Syndrome:
             eng_column (str): like 'A' or 'G' column
         """
         worksheet.column_dimensions[eng_column].width = 20
-        # 設定儲存格顏色
-        fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
-        worksheet[f'{eng_column}1'].fill = fill
-        # 設定儲存格字體顏色
-        font = Font(color='FF0000')
-        worksheet[f'{eng_column}1'].font = font
+        worksheet[f'{eng_column}1'].fill = self.fill
+        worksheet[f'{eng_column}1'].font = self.font
         return worksheet
 
 
-    def set_red_font(self,val):
+    def set_red_font(self, val):
         return 'color: red'
 
 
+    def change_font_color_format(self, cell, fill_cell=True):
+        """Change cell color and font color 
+
+        Args:
+            cell : the cell coordinate
+        """
+        if fill_cell:
+            cell.fill = self.fill
+        cell.font = self.font
+
     def label_over_standard(self, worksheet):
-        fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
-        font = Font(color='FF0000')
+        """Use to label the cell, if cell's value exceed the standard
+
+        Args:
+            worksheet: the excel work sheet 
+
+        Returns:
+            worksheet
+        """
         for row in worksheet.iter_rows(min_row=2):
+            people_name = row[1]
+            
             gender = row[self.metabolic_syndrome_column[0]] 
             waistline = row[self.metabolic_syndrome_column[1]]
             systolic = row[self.metabolic_syndrome_column[2]]
@@ -74,53 +92,67 @@ class Judge_Metabolic_Syndrome:
             glucose = row[self.metabolic_syndrome_column[4]]
             triglycerides = row[self.metabolic_syndrome_column[5]]
             hdlc = row[self.metabolic_syndrome_column[6]]
+            
             if gender.value == '男':
                 if waistline.value >= self.standard_waistline:
-                    waistline.fill = fill
-                    waistline.font = font
+                    self.change_font_color_format(waistline)
+                    self.over_standard_cut += 1
                 if systolic.value >= self.standard_systolic_blood_pressure:
-                    systolic.fill = fill
-                    systolic.font = font
+                    self.change_font_color_format(systolic)
+                    self.over_standard_cut += 1
                 if diastolic.value >= self.standard_diastolic_blood_pressure:
-                    diastolic.fill = fill
-                    diastolic.font = font
+                    self.change_font_color_format(diastolic)
+                    self.over_standard_cut += 1
                 if glucose.value >= self.standard_glucose:
-                    glucose.fill = fill
-                    glucose.font = font
+                    self.change_font_color_format(glucose)
+                    self.over_standard_cut += 1
                 if triglycerides.value >= self.standard_triglycerides:
-                    triglycerides.fill = fill
-                    triglycerides.font = font
+                    self.change_font_color_format(triglycerides)
+                    self.over_standard_cut += 1
                 if hdlc.value < self.hdlc:
-                    hdlc.fill = fill
-                    hdlc.font = font
+                    self.change_font_color_format(hdlc)
+                    self.over_standard_cut += 1
+                if self.over_standard_cut >= 3:
+                    self.change_font_color_format(people_name, fill_cell=False)
 
             elif gender.value == '女':
                 if waistline.value >= self.standard_waistline-10:
-                    waistline.fill = fill
-                    waistline.font = font
+                    self.change_font_color_format(waistline)
+                    self.over_standard_cut += 1
                 if systolic.value >= self.standard_systolic_blood_pressure:
-                    systolic.fill = fill
-                    systolic.font = font
+                    self.change_font_color_format(systolic)
+                    self.over_standard_cut += 1
                 if diastolic.value >= self.standard_diastolic_blood_pressure:
-                    diastolic.fill = fill
-                    diastolic.font = font
+                    self.change_font_color_format(diastolic)
+                    self.over_standard_cut += 1
                 if glucose.value >= self.standard_glucose:
-                    glucose.fill = fill
-                    glucose.font = font
+                    self.change_font_color_format(glucose)
+                    self.over_standard_cut += 1
                 if triglycerides.value >= self.standard_triglycerides:
-                    triglycerides.fill = fill
-                    triglycerides.font = font
+                    self.change_font_color_format(triglycerides)
+                    self.over_standard_cut += 1
                 if hdlc.value < self.hdlc+10:
-                    hdlc.fill = fill
-                    hdlc.font = font
+                    self.change_font_color_format(hdlc)
+                    self.over_standard_cut += 1
+                if self.over_standard_cut >= 3:
+                    self.change_font_color_format(people_name, fill_cell=False)
         return worksheet
     
 
-    def copy_format_from_sheet1(self, io):
+    def copy_format_from_sheet1(self, io, src_worksheet:str, dst_worksheet:str):
+        """Copy the original sheet header format to specific sheet
+
+        Including cell's fill, font, color, alignment, dimensions.
+
+        Args:
+            io (str): Fila path
+            src_worksheet (str): Name of process sheet
+            dst_worksheet (str): Name of saving sheet
+        """
         workbook = openpyxl.load_workbook(io)
         
-        ws1 = workbook["健檢資料"]
-        ws2 = workbook["工作表1"]
+        ws1 = workbook[src_worksheet]
+        ws2 = workbook[dst_worksheet]
         # copy format sheet1 header to sheet2 header
         
         for row in ws1.iter_rows(min_row=1, max_row=1):
@@ -146,14 +178,16 @@ class Judge_Metabolic_Syndrome:
         print("saved")
 
 
-    def process_Metabolic_Syndrome(self, io:str):
+    def process_Metabolic_Syndrome(self, io:str, src_worksheet:str, dst_worksheet:str):
         """篩選代謝症候群的Excel檔案
 
         Args:
-            io : file_path
+            io (str): Fila path
+            src_worksheet (str): Name of process sheet
+            dst_worksheet (str): Name of saving sheet
         """
 
-        df = pd.read_excel(io, sheet_name='健檢資料', engine = 'openpyxl')
+        df = pd.read_excel(io, sheet_name=src_worksheet, engine = 'openpyxl')
         df['超過標準數'] = 0
              
         for i in range(len(df.index)):
@@ -164,54 +198,58 @@ class Judge_Metabolic_Syndrome:
             glucose = df.iloc[i,self.metabolic_syndrome_column[4]]
             triglycerides = df.iloc[i,self.metabolic_syndrome_column[5]]
             hdlc = df.iloc[i,self.metabolic_syndrome_column[6]]
+            
             if gender == '男':
-                over_standard_cnt = 0
                 if waistline >= self.standard_waistline:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if systolic >= self.standard_systolic_blood_pressure:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if diastolic >= self.standard_diastolic_blood_pressure:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if glucose >= self.standard_glucose:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if triglycerides >= self.standard_triglycerides:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if hdlc < self.hdlc:
-                    over_standard_cnt += 1
-                df.iloc[i, len(df.columns)-1] = over_standard_cnt
+                    self.over_standard_cnt += 1
+                df.iloc[i, len(df.columns)-1] = self.over_standard_cnt
                 
             elif gender == '女':
-                over_standard_cnt = 0
                 if waistline >= self.standard_waistline-10:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if systolic >= self.standard_systolic_blood_pressure:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if diastolic >= self.standard_diastolic_blood_pressure:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if glucose >= self.standard_glucose:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if triglycerides >= self.standard_triglycerides:
-                    over_standard_cnt += 1
+                    self.over_standard_cnt += 1
                 if hdlc < self.hdlc+10:
-                    over_standard_cnt += 1              
-                df.iloc[i, len(df.columns)-1] = over_standard_cnt
+                    self.over_standard_cnt += 1              
+                df.iloc[i, len(df.columns)-1] = self.over_standard_cnt
 
         for i in range(len(df['超過標準數'])):
             if df['超過標準數'][i] < 3:
                 df = df.drop(labels=i, axis=0)
         
-        # df = df.style.applymap(self.set_red_font, subset=pd.IndexSlice[5, '高密度膽固醇']).set_properties(**{'text-align': 'center'})
+        df = df.sort_values(by=['超過標準數'], ascending=False)
         # 建立一個新的 ExcelWriter 物件
         writer = pd.ExcelWriter(io, mode='a', engine='openpyxl', if_sheet_exists='replace')
         
-        df.to_excel(writer, sheet_name='工作表1', index=False)
-        writer.close()        
-        self.copy_format_from_sheet1(io=io)
+        df.to_excel(writer, sheet_name=dst_worksheet, index=False)
+        writer.close() 
+        return io, src_worksheet, dst_worksheet
+
+    def main_processdure(self, io, src_worksheet, dst_worksheet):
+        filepath, original_sheet, save_sheet = self.process_Metabolic_Syndrome(io=io, src_worksheet=src_worksheet, dst_worksheet=dst_worksheet)
+        self.copy_format_from_sheet1(io=filepath, src_worksheet=original_sheet, dst_worksheet=save_sheet)
     
 
 def main():
-    Judge_Metabolic_Syndrome().process_Metabolic_Syndrome('111.xlsx')
+    Judge_Metabolic_Syndrome().main_processdure('111.xlsx', src_worksheet='健檢資料', dst_worksheet='工作表1')
     print("Finish")
 
 if __name__ == '__main__':
+
     main()
