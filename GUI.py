@@ -1,5 +1,5 @@
 from tkinter import *
-
+import time
 from PIL import Image, ImageTk 
 import cv2 as cv
 from tkinter import filedialog, messagebox
@@ -9,7 +9,6 @@ from tkinter import ttk
 import numpy as np
 from process import Judge_Metabolic_Syndrome
 import webbrowser
-
 
 
 class Excel_GUI:
@@ -83,9 +82,10 @@ class Excel_GUI:
         self.comfirm_button.place(x=self.windows_w-250, y=self.windows_h-50, anchor='center')
         self.comfirm_button["state"] = "disabled"
 
-        self.Copyright_Font = Font(family="微軟正黑體", size=7)
-        self.Copyright_label = Label(self.root, text='Copyright © 2023 YF Liu. All rights reserved.', font=self.Copyright_Font , bg=self.bgcolor)
+        self.Copyright_label = Label(self.root, text='Copyright © 2023 YF Liu. All rights reserved.', font=("微軟正黑體", 7) , bg=self.bgcolor)
         self.Copyright_label.place(x=0, y=380)
+
+        
         
     def resize(self, imgpath:str, resize_w:int, resize_h:int, changeBG=True):
         image_name = imgpath.split("\\")[-1].split(".")[0]
@@ -102,6 +102,7 @@ class Excel_GUI:
 
     def finishInfo(self):
         messagebox.showinfo(title="通知", message="OK")
+
 
     def openFile(self):
         global filepath
@@ -123,11 +124,11 @@ class Excel_GUI:
             types = self.box.get()
             if types == self.options[0]:
                 JMS = Judge_Metabolic_Syndrome()
-                processing_label = ttk.Label(text="處理中...", foreground="red", font=(16))
                 t = threading.Thread(target=JMS.process_Metabolic_Syndrome(filepath, src_worksheet=process_sheet, dst_worksheet=save_sheet))
                 t.start()
-                processing_label.place(x=250, y=295, anchor="center")
-                processing_label.destroy() 
+                self.update_clock()
+                time.sleep(2)
+                self.clock_label.destroy() 
                 self.finishInfo()
 
             else:
@@ -138,12 +139,18 @@ class Excel_GUI:
         icon = ImageTk.PhotoImage(img) 
         return icon
     
+
     def linked_to_github(self):
         url = 'https://github.com/Yi-Feng-Liu/Excel-Filter-Tool'
         webbrowser.open(url)
         
 
-
+    def update_clock(self):
+        current_time = time.strftime("%S")
+        clock_label = tk.Label(root, font=("Helvetica", 24))
+        clock_label.config(text=current_time)
+        clock_label.place(x=250, y=295, anchor="center")
+        self.root.after(1000, self.update_clock)
     
  
 import tkinter as tk

@@ -62,14 +62,12 @@ class Judge_Metabolic_Syndrome:
         return 'color: red'
 
 
-    def change_font_color_format(self, cell, fill_cell=True):
+    def change_font_color_format(self, cell):
         """Change cell color and font color 
 
         Args:
             cell : the cell coordinate
         """
-        if fill_cell:
-            cell.fill = self.fill
         cell.font = self.font
 
     def label_over_standard(self, worksheet):
@@ -112,7 +110,7 @@ class Judge_Metabolic_Syndrome:
                     self.change_font_color_format(hdlc)
                     over_standard_cnt += 1
                 if over_standard_cnt >= 3:
-                    self.change_font_color_format(people_name, fill_cell=False)
+                    self.change_font_color_format(people_name)
 
             elif gender.value == '女':
                 if waistline.value >= self.standard_waistline-10:
@@ -134,7 +132,7 @@ class Judge_Metabolic_Syndrome:
                     self.change_font_color_format(hdlc)
                     over_standard_cnt += 1
                 if over_standard_cnt >= 3:
-                    self.change_font_color_format(people_name, fill_cell=False)
+                    self.change_font_color_format(people_name)
         return worksheet
     
 
