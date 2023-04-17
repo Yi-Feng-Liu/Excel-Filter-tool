@@ -143,6 +143,7 @@ class Excel_GUI:
             else:
                 messagebox.showerror(title="錯誤", message="請選擇檔案類型")
 
+
     def getIcon(self, img_path):
         img = Image.open(img_path)
         icon = ImageTk.PhotoImage(img) 
