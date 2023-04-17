@@ -1,5 +1,5 @@
 from tkinter import *
-import time
+import pandas as pd
 from PIL import Image, ImageTk 
 import cv2 as cv
 from tkinter import filedialog, messagebox
@@ -63,15 +63,16 @@ class Excel_GUI:
         self.pikachu = Button(root, image=self.decoration, command=self.linked_to_github)
         self.pikachu.place(x=self.windows_w - width, y=self.windows_h - height)
 
-        # set entry for enter process sheet & save sheet
-        self.process_sheet_name_label = Label(root, text='Sheet 1:', font=self.font, bg=self.bgcolor)
-        self.process_sheet_name_label.place(x=80, y=230)
-        self.process_sheet_name_entry = Entry(root, width=30)
-        self.process_sheet_name_entry.place(x=150, y=233)
-        self.save_sheet_name_label = Label(root, text='Sheet 2:', font=self.font, bg=self.bgcolor)
-        self.save_sheet_name_label.place(x=80, y=250)
+        # set years combobox
+        self.years_combobox_label = Label(root, text='Select Years:', font=self.font, bg=self.bgcolor)
+        self.years_combobox_label.place(x=50, y=230)
+        self.years_combobox = ttk.Combobox(self.root, values=None, width=27)
+        self.years_combobox.place(x=150, y=233)
+        # set entry & save sheet
+        self.save_sheet_name_label = Label(root, text='Sheet Name:', font=self.font, bg=self.bgcolor)
+        self.save_sheet_name_label.place(x=47, y=260)
         self.save_sheet_name_entry = Entry(root, width=30)
-        self.save_sheet_name_entry.place(x=150, y=253)
+        self.save_sheet_name_entry.place(x=150, y=263)
 
         # set the confirm button using image
         self.button_img = self.resize('confirm.jpg', resize_w=70, resize_h=60, changeBG=False)
@@ -84,9 +85,7 @@ class Excel_GUI:
 
         self.Copyright_label = Label(self.root, text='Copyright © 2023 YF Liu. All rights reserved.', font=("微軟正黑體", 7) , bg=self.bgcolor)
         self.Copyright_label.place(x=0, y=380)
-
-        
-        
+    
     def resize(self, imgpath:str, resize_w:int, resize_h:int, changeBG=True):
         image_name = imgpath.split("\\")[-1].split(".")[0]
         
@@ -95,7 +94,7 @@ class Excel_GUI:
         if changeBG:
             origin_img[np.where((origin_img == [255, 255, 255]).all(axis=2))] = [211, 239, 211]
         resize_img = cv.resize(origin_img, (resize_w, resize_h))
-        save_path = f'D:\\GUI\\Test\\{image_name}_resize.jpg'
+        save_path = f'{image_name}_resize.jpg'
         cv.imwrite(save_path, resize_img)
         return save_path
 
@@ -106,31 +105,41 @@ class Excel_GUI:
 
     def openFile(self):
         global filepath
+        global tabs
+        
         filepath = filedialog.askopenfilename(title="選擇檔案", filetypes=[("Excel files", ".xlsx .xls")])
-
         if filepath:
             self.label.config(text=f'選取的檔案路徑為\n {filepath}')
             self.comfirm_button["state"] = "active"
+            try:
+                df = pd.read_excel(filepath, sheet_name='健檢資料', engine = 'openpyxl')
+                df_years_list = list(dict.fromkeys(df['年度代碼'].tolist()))
+                tabs = pd.ExcelFile(filepath).sheet_names # get list of sheet names 
+                self.years_combobox['values'] = df_years_list
+            except Exception as Error:
+                messagebox.showerror(title='Error', message=Error)
+                self.comfirm_button["state"] = "disabled"
+                self.years_combobox['values'] = None
+            
         else:
             self.label.config(text=f'沒有選取的檔案!')
             self.comfirm_button["state"] = "disabled"
-
+        
+ 
     def processExcel(self):
-        process_sheet = self.process_sheet_name_entry.get()
+        select_year = self.years_combobox.get()
         save_sheet = self.save_sheet_name_entry.get()
-        if process_sheet == save_sheet:
+        
+        if save_sheet in tabs:
             messagebox.showerror(title='Error', message='The Same of Sheet Names That is Not Allow')
         else:
             types = self.box.get()
             if types == self.options[0]:
                 JMS = Judge_Metabolic_Syndrome()
-                t = threading.Thread(target=JMS.process_Metabolic_Syndrome(filepath, src_worksheet=process_sheet, dst_worksheet=save_sheet))
+                t = threading.Thread(target=JMS.process_Metabolic_Syndrome(io=filepath, select_years=select_year, dst_worksheet=save_sheet))
                 t.start()
-                self.update_clock()
-                time.sleep(2)
-                self.clock_label.destroy() 
                 self.finishInfo()
-
+                
             else:
                 messagebox.showerror(title="錯誤", message="請選擇檔案類型")
 
@@ -145,12 +154,8 @@ class Excel_GUI:
         webbrowser.open(url)
         
 
-    def update_clock(self):
-        current_time = time.strftime("%S")
-        clock_label = tk.Label(root, font=("Helvetica", 24))
-        clock_label.config(text=current_time)
-        clock_label.place(x=250, y=295, anchor="center")
-        self.root.after(1000, self.update_clock)
+    
+        
     
  
 import tkinter as tk
