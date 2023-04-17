@@ -136,19 +136,18 @@ class Judge_Metabolic_Syndrome:
         return worksheet
     
 
-    def copy_format_from_sheet1(self, io, src_worksheet:str, dst_worksheet:str):
+    def copy_format_from_sheet1(self, io, dst_worksheet:str):
         """Copy the original sheet header format to specific sheet
 
         Including cell's fill, font, color, alignment, dimensions.
 
         Args:
             io (str): Fila path
-            src_worksheet (str): Name of process sheet
             dst_worksheet (str): Name of saving sheet
         """
         workbook = openpyxl.load_workbook(io)
         
-        ws1 = workbook[src_worksheet]
+        ws1 = workbook['健檢資料']
         ws2 = workbook[dst_worksheet]
         # copy format sheet1 header to sheet2 header
         
@@ -169,13 +168,14 @@ class Judge_Metabolic_Syndrome:
         ws2 = self.place_center(worksheet=ws2)
 
         # label_over_standard worksheet
-        ws1 = self.label_over_standard(worksheet=ws1)
+        # ws1 = self.label_over_standard(worksheet=ws1)
+        # only process new sheet
         ws2 = self.label_over_standard(worksheet=ws2)
         workbook.save(io)
         print("saved")
 
 
-    def process_Metabolic_Syndrome(self, io:str, src_worksheet:str, dst_worksheet:str):
+    def process_Metabolic_Syndrome(self, io:str, select_years:str, dst_worksheet:str):
         """篩選代謝症候群的Excel檔案
 
         Args:
@@ -184,8 +184,11 @@ class Judge_Metabolic_Syndrome:
             dst_worksheet (str): Name of saving sheet
         """
 
-        df = pd.read_excel(io, sheet_name=src_worksheet, engine = 'openpyxl')
+        df = pd.read_excel(io, sheet_name='健檢資料', engine = 'openpyxl')
+        
         df['超過標準數'] = 0
+        
+        df = df[df['年度代碼'].str.startswith(select_years)]
              
         for i in range(len(df.index)):
             gender = df.iloc[i,self.metabolic_syndrome_column[0]] 
@@ -226,23 +229,22 @@ class Judge_Metabolic_Syndrome:
                     over_standard_cnt += 1              
                 df.iloc[i, len(df.columns)-1] = over_standard_cnt
 
-        for i in range(len(df['超過標準數'])):
-            if df['超過標準數'][i] < 3:
-                df = df.drop(labels=i, axis=0)
+        # 將不符合的drop
+        # for i in range(len(df['超過標準數'])):
+        #     if df['超過標準數'][i] < 3:
+        #         df = df.drop(labels=i, axis=0)
         
         df = df.sort_values(by=['超過標準數'], ascending=False)
         # 建立一個新的 ExcelWriter 物件
         writer = pd.ExcelWriter(io, mode='a', engine='openpyxl', if_sheet_exists='replace')
-        
         df.to_excel(writer, sheet_name=dst_worksheet, index=False)
         writer.close() 
         
-        self.copy_format_from_sheet1(io=io, src_worksheet=src_worksheet, dst_worksheet=dst_worksheet)
-
+        self.copy_format_from_sheet1(io=io, dst_worksheet=dst_worksheet)
 
 
 def main():
-    Judge_Metabolic_Syndrome().process_Metabolic_Syndrome('111.xlsx', src_worksheet='健檢資料', dst_worksheet='工作表1')
+    Judge_Metabolic_Syndrome().process_Metabolic_Syndrome('111.xlsx', select_years='111', dst_worksheet='工作表1')
     print("Finish")
 
 if __name__ == '__main__':
