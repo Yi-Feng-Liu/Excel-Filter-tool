@@ -42,7 +42,7 @@ class Excel_GUI:
         self.root = root
         # set background color
         self.bgcolor = "#d2efd3"
-
+        self.empty_ls = []
         # set windows size
         self.windows_w = 500
         self.windows_h = 450
@@ -115,10 +115,10 @@ class Excel_GUI:
         self.sheet_comfirm_button.place(x=390, y=self.windows_h-208, anchor='center')
         self.sheet_comfirm_button["state"] = "active"
         # set years comfirm button
-        self.years_comfirm_button = Button(root, text="Submit", command=self.processExcel)
-        self.years_comfirm_button.pack()
-        self.years_comfirm_button.place(x=390, y=self.windows_h-178, anchor='center')
-        self.years_comfirm_button["state"] = "active"
+        # self.years_comfirm_button = Button(root, text="Submit", command=self.get_select_years)
+        # self.years_comfirm_button.pack()
+        # self.years_comfirm_button.place(x=390, y=self.windows_h-178, anchor='center')
+        # self.years_comfirm_button["state"] = "active"
 
 
         # set the confirm button using image
@@ -162,6 +162,7 @@ class Excel_GUI:
             tabs = pd.ExcelFile(filepath).sheet_names 
             self.sheets_names_combobox['values'] = tabs
         else:
+            self.sheets_names_combobox['values'] = self.empty_ls
             self.label.config(text=f'沒有選取的檔案!')
             self.comfirm_button["state"] = "disabled"
         
@@ -169,19 +170,29 @@ class Excel_GUI:
     def get_sheet_name(self):
         global sheetName
         sheetName = self.sheets_names_combobox.get()
-        
         try:
-            if sheetName != None:
-                df = pd.read_excel(filepath, sheet_name=sheetName, engine = 'openpyxl')
-                df_years_list = list(dict.fromkeys(df['年度代碼'].tolist()))
-                self.years_combobox['values'] = df_years_list
-            # else:
-            #     self.sheet_comfirm_button["state"] = "disabled"      
+            df = pd.read_excel(filepath, sheet_name=sheetName, engine = 'openpyxl')
+            df_years_list = list(dict.fromkeys(df['年度代碼'].tolist()))
+            self.years_combobox['values'] = df_years_list     
         except Exception as Error:
+            self.years_combobox['values'] = self.empty_ls
             messagebox.showerror(title='Error', message=Error)
-            # self.sheet_comfirm_button["state"] = "disabled"
-            self.years_combobox['values'] = None  
-        
+              
+
+    # def get_select_years(self):
+    #     global select_year
+    #     select_year = self.years_combobox.get()
+    #     try:
+    #         if len(select_year) == 0:
+    #             messagebox.showerror(title='Error', message='Empty Entry is Not Allow')
+    #             self.years_combobox['values'] = None 
+    #         # df = pd.read_excel(filepath, sheet_name=sheetName, engine = 'openpyxl')
+    #         # df_years_list = list(dict.fromkeys(df['年度代碼'].tolist()))
+    #         # self.years_combobox['values'] = df_years_list     
+    #     except Exception as Error:
+    #         messagebox.showerror(title='Error', message=Error)
+    #         self.years_combobox['values'] = None  
+
 
     def processExcel(self):
         select_year = self.years_combobox.get()
