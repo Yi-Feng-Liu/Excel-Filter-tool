@@ -4,7 +4,6 @@ from openpyxl.styles import Font, PatternFill
 from openpyxl.styles import Alignment, numbers
 import copy
 import time
-import threading
 
 
 class Judge_Metabolic_Syndrome:

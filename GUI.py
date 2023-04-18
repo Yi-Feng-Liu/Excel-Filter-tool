@@ -112,15 +112,14 @@ class Excel_GUI:
             self.label.config(text=f'選取的檔案路徑為\n {filepath}')
             self.comfirm_button["state"] = "active"
             try:
+                tabs = pd.ExcelFile(filepath).sheet_names # get list of sheet names 
                 df = pd.read_excel(filepath, sheet_name='健檢資料', engine = 'openpyxl')
                 df_years_list = list(dict.fromkeys(df['年度代碼'].tolist()))
-                tabs = pd.ExcelFile(filepath).sheet_names # get list of sheet names 
                 self.years_combobox['values'] = df_years_list
             except Exception as Error:
                 messagebox.showerror(title='Error', message=Error)
                 self.comfirm_button["state"] = "disabled"
-                self.years_combobox['values'] = None
-            
+                self.years_combobox['values'] = None        
         else:
             self.label.config(text=f'沒有選取的檔案!')
             self.comfirm_button["state"] = "disabled"
