@@ -11,6 +11,32 @@ from process import Judge_Metabolic_Syndrome
 import webbrowser
 
 
+class EntryWithPlaceholder(Entry):
+    def __init__(self, master=None, placeholder="PLACEHOLDER", color='grey', width=30):
+        super().__init__(master)
+        self.placeholder = placeholder
+        self.placeholder_color = color
+        self['width'] = width
+        self.default_fg_color = self['fg']
+
+        self.bind("<FocusIn>", self.foc_in)
+        self.bind("<FocusOut>", self.foc_out)
+
+        self.put_placeholder()
+
+    def put_placeholder(self):
+        self.insert(0, self.placeholder)
+        self['fg'] = self.placeholder_color
+
+    def foc_in(self, *args):
+        if self['fg'] == self.placeholder_color:
+            self.delete('0', 'end')
+            self['fg'] = self.default_fg_color
+
+    def foc_out(self, *args):
+        if not self.get():
+            self.put_placeholder()
+            
 class Excel_GUI:
     def __init__(self, root):
         self.root = root
@@ -71,7 +97,7 @@ class Excel_GUI:
         # set entry & save sheet
         self.save_sheet_name_label = Label(root, text='Sheet Name:', font=self.font, bg=self.bgcolor)
         self.save_sheet_name_label.place(x=47, y=260)
-        self.save_sheet_name_entry = Entry(root, width=30)
+        self.save_sheet_name_entry = EntryWithPlaceholder(master=root, placeholder='輸入要儲存的Sheet名稱', width=30)
         self.save_sheet_name_entry.place(x=150, y=263)
 
         # set the confirm button using image
