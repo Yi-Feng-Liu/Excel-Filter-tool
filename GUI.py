@@ -45,7 +45,7 @@ class Excel_GUI:
 
         # set windows size
         self.windows_w = 500
-        self.windows_h = 400
+        self.windows_h = 450
         self.font = Font(family="微軟正黑體", size=12)
 
         # set windows position
@@ -89,16 +89,37 @@ class Excel_GUI:
         self.pikachu = Button(root, image=self.decoration, command=self.linked_to_github)
         self.pikachu.place(x=self.windows_w - width, y=self.windows_h - height)
 
+        # select process sheet name from file path
+        self.combobox_xlabel_place = 47
+        self.combobox_place = 150
+        self.sheets_names_combobox_label = Label(root, text='Select Sheet:', font=self.font, bg=self.bgcolor)
+        self.sheets_names_combobox_label.place(x=self.combobox_xlabel_place, y=self.windows_h-220)
+        self.sheets_names_combobox = ttk.Combobox(self.root, values=None, width=27)
+        self.sheets_names_combobox.place(x=self.combobox_place, y=self.windows_h-217)
+
         # set years combobox
         self.years_combobox_label = Label(root, text='Select Years:', font=self.font, bg=self.bgcolor)
-        self.years_combobox_label.place(x=50, y=230)
+        self.years_combobox_label.place(x=self.combobox_xlabel_place, y=self.windows_h-190)
         self.years_combobox = ttk.Combobox(self.root, values=None, width=27)
-        self.years_combobox.place(x=150, y=233)
+        self.years_combobox.place(x=self.combobox_place, y=self.windows_h-187)
         # set entry & save sheet
         self.save_sheet_name_label = Label(root, text='Sheet Name:', font=self.font, bg=self.bgcolor)
-        self.save_sheet_name_label.place(x=47, y=260)
-        self.save_sheet_name_entry = EntryWithPlaceholder(master=root, placeholder='輸入要儲存的Sheet名稱', width=30)
-        self.save_sheet_name_entry.place(x=150, y=263)
+        self.save_sheet_name_label.place(x=self.combobox_xlabel_place, y=self.windows_h-160)
+        self.defalut_placeholder_message = '輸入要儲存的Sheet名稱'
+        self.save_sheet_name_entry = EntryWithPlaceholder(master=root, placeholder=self.defalut_placeholder_message, width=30)
+        self.save_sheet_name_entry.place(x=self.combobox_place, y=self.windows_h-157)
+
+        # set sheet comfirm button
+        self.sheet_comfirm_button = Button(root, text="Submit", command=self.get_sheet_name)
+        self.sheet_comfirm_button.pack()
+        self.sheet_comfirm_button.place(x=390, y=self.windows_h-208, anchor='center')
+        self.sheet_comfirm_button["state"] = "active"
+        # set years comfirm button
+        self.years_comfirm_button = Button(root, text="Submit", command=self.processExcel)
+        self.years_comfirm_button.pack()
+        self.years_comfirm_button.place(x=390, y=self.windows_h-178, anchor='center')
+        self.years_comfirm_button["state"] = "active"
+
 
         # set the confirm button using image
         self.button_img = self.resize('confirm.jpg', resize_w=70, resize_h=60, changeBG=False)
@@ -110,7 +131,7 @@ class Excel_GUI:
         self.comfirm_button["state"] = "disabled"
 
         self.Copyright_label = Label(self.root, text='Copyright © 2023 YF Liu. All rights reserved.', font=("微軟正黑體", 7) , bg=self.bgcolor)
-        self.Copyright_label.place(x=0, y=380)
+        self.Copyright_label.place(x=0, y=self.windows_h-20)
     
     def resize(self, imgpath:str, resize_w:int, resize_h:int, changeBG=True):
         image_name = imgpath.split("\\")[-1].split(".")[0]
@@ -137,27 +158,43 @@ class Excel_GUI:
         if filepath:
             self.label.config(text=f'選取的檔案路徑為\n {filepath}')
             self.comfirm_button["state"] = "active"
-            try:
-                tabs = pd.ExcelFile(filepath).sheet_names # get list of sheet names 
-                df = pd.read_excel(filepath, sheet_name='健檢資料', engine = 'openpyxl')
-                df_years_list = list(dict.fromkeys(df['年度代碼'].tolist()))
-                self.years_combobox['values'] = df_years_list
-            except Exception as Error:
-                messagebox.showerror(title='Error', message=Error)
-                self.comfirm_button["state"] = "disabled"
-                self.years_combobox['values'] = None        
+            # get list of sheet names 
+            tabs = pd.ExcelFile(filepath).sheet_names 
+            self.sheets_names_combobox['values'] = tabs
         else:
             self.label.config(text=f'沒有選取的檔案!')
             self.comfirm_button["state"] = "disabled"
         
- 
+
+    def get_sheet_name(self):
+        global sheetName
+        sheetName = self.sheets_names_combobox.get()
+        
+        try:
+            if sheetName != None:
+                df = pd.read_excel(filepath, sheet_name=sheetName, engine = 'openpyxl')
+                df_years_list = list(dict.fromkeys(df['年度代碼'].tolist()))
+                self.years_combobox['values'] = df_years_list
+            # else:
+            #     self.sheet_comfirm_button["state"] = "disabled"      
+        except Exception as Error:
+            messagebox.showerror(title='Error', message=Error)
+            # self.sheet_comfirm_button["state"] = "disabled"
+            self.years_combobox['values'] = None  
+        
+
     def processExcel(self):
         select_year = self.years_combobox.get()
         save_sheet = self.save_sheet_name_entry.get()
         
         if save_sheet in tabs:
             messagebox.showerror(title='Error', message='The Same of Sheet Names That is Not Allow')
+            self.comfirm_button["state"] = "disabled"
+        elif save_sheet == self.defalut_placeholder_message:
+            messagebox.showerror(title='Error', message='儲存的工作表名稱不可空白')
+            self.comfirm_button["state"] = "disabled"
         else:
+            
             types = self.box.get()
             if types == self.options[0]:
                 JMS = Judge_Metabolic_Syndrome()
