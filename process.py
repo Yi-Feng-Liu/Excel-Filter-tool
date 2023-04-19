@@ -183,7 +183,7 @@ class Judge_Metabolic_Syndrome:
             dst_worksheet (str): Name of saving sheet
         """
 
-        df = pd.read_excel(io, sheet_name='健檢資料', engine = 'openpyxl')
+        df = pd.read_excel(io, sheet_name='健檢資料', engine='openpyxl')
         
         df['超過標準數'] = 0
         
