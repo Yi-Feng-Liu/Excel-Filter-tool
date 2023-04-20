@@ -264,14 +264,10 @@ class Excel_GUI:
         else:
             types = self.box.get()
             if types == self.options[0]:
-                JMS = Judge_Metabolic_Syndrome()
-                t = threading.Thread(target=JMS.process_Metabolic_Syndrome(io=filepath, select_years=select_year, dst_worksheet=save_sheet))
-                t.start()
+                Judge_Metabolic_Syndrome(io=filepath, select_years=select_year, dst_worksheet=save_sheet)
                 self.finishInfo()
-                
             else:
                 messagebox.showerror(title="錯誤", message="請選擇檔案類型")
-
 
     def getIcon(self, img_path):
         img = Image.open(img_path)
