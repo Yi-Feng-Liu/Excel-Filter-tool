@@ -57,6 +57,7 @@ class Excel_GUI:
         self.years_combobox_label = Label(root, text="", font=self.font, bg=self.bgcolor)
         self.save_sheet_name_label = Label(root, text="", font=self.font, bg=self.bgcolor)
         self.select_button = Button(root, text="", command=self.openFile)
+        self.label = Label(root, text="", font=self.font, bg=self.bgcolor)
         # can't not sesize wiondow
         self.resizable = root.resizable(width=0, height=0)
         self.attributes = root.attributes('-alpha', 1)
@@ -110,6 +111,7 @@ class Excel_GUI:
         self.years_combobox_label.destroy()
         self.sheets_names_combobox_label.destroy()
         self.select_button.destroy()
+        self.label.destroy()
         
 
     def choose_e_file(self):
@@ -132,7 +134,7 @@ class Excel_GUI:
 
         # update choose file path
         self.label = Label(root, text='', font=self.font, bg=self.bgcolor)
-        self.label.place(x=120, y=180)
+        self.label.place(x=250, y=210, anchor='center')
         
         self.combobox_xlabel_place = 47
         self.combobox_place = 150
@@ -179,7 +181,7 @@ class Excel_GUI:
 
         # update choose file path
         self.label = Label(root, text='', font=self.font, bg=self.bgcolor)
-        self.label.place(x=120, y=180)
+        self.label.place(x=250, y=210, anchor='center')
         
         self.combobox_xlabel_place = 47
         self.combobox_place = 150
@@ -264,7 +266,7 @@ class Excel_GUI:
         else:
             types = self.box.get()
             if types == self.options[0]:
-                Judge_Metabolic_Syndrome(io=filepath, select_years=select_year, dst_worksheet=save_sheet)
+                Judge_Metabolic_Syndrome(io=filepath, select_years=select_year, save_sheet_name=save_sheet, save_file_path=None)
                 self.finishInfo()
             else:
                 messagebox.showerror(title="錯誤", message="請選擇檔案類型")

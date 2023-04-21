@@ -7,21 +7,41 @@ import time
 
 
 class Judge_Metabolic_Syndrome:
-    def __init__(self, io, select_years, dst_worksheet):
+    def __init__(self, io, select_years, save_sheet_name, save_file_path, from_summary=False):
         self.io = io
-        self.dst_worksheet = dst_worksheet
+        self.dst_worksheet = save_sheet_name
         self.select_years = select_years
+        self.save_file_path = save_file_path
         self.standard_waistline = 90
         self.standard_systolic_blood_pressure = 130
         self.standard_diastolic_blood_pressure = 85
         self.standard_glucose = 100
         self.standard_triglycerides = 150
         self.hdlc = 40
-        self.red_font = Font(color='FF0000')
         self.metabolic_syndrome_column = [5, 9, 10, 11, 12, 14, 15]
         self.fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
-        self.font = Font(color='FF0000')
+        self.font = Font(name='Calibri', color='FF0000')
+        self.font_type = Font(name='Calibri')
+        self.from_summary = from_summary
+        self.gender_dict = {'gender': 5}
+        self.column_dict={
+            'waistline':9,
+            'systolic':10,
+            'diastolic':11,
+            'glucose':12,
+            'triglycerides':14,
+            'hdlc':15
+        }
+        self.standard_dict={
+            'waistline': 90,
+            'systolic': 130,
+            'diastolic': 85,
+            'glucose':100,
+            'triglycerides':150,
+            'hdlc': 40
+        }
         self.main_procesdure()
+        
 
     def change_date_time(self, worksheet, number_of_column):
         """Remove hours:minute:second format of the datetime 
@@ -62,13 +82,24 @@ class Judge_Metabolic_Syndrome:
 
 
     def change_font_color_format(self, cell):
-        """Change cell color and font color 
+        """Change font color 
 
         Args:
             cell : the cell coordinate
         """
         cell.font = self.font
+    
+    def change_font_type_format(self, worksheet):
+        """Change font type 
 
+        Args:
+            cell : the cell coordinate
+        """
+        for row in worksheet.iter_rows(min_row=2):
+            for cell in row:
+                # 設置儲存格的字體
+                cell.font = self.font_type
+        return worksheet
 
     def label_over_standard(self, worksheet):
         """Use to label the cell, if cell's value exceed the standard
@@ -79,60 +110,40 @@ class Judge_Metabolic_Syndrome:
         Returns:
             worksheet
         """
+        worksheet = self.change_font_type_format(worksheet)
+
         for row in worksheet.iter_rows(min_row=2):
             people_name = row[1]
-            
-            gender = row[self.metabolic_syndrome_column[0]] 
-            waistline = row[self.metabolic_syndrome_column[1]]
-            systolic = row[self.metabolic_syndrome_column[2]]
-            diastolic = row[self.metabolic_syndrome_column[3]]
-            glucose = row[self.metabolic_syndrome_column[4]]
-            triglycerides = row[self.metabolic_syndrome_column[5]]
-            hdlc = row[self.metabolic_syndrome_column[6]]
+            gender = row[self.gender_dict['gender']] 
             over_standard_cnt = 0
             if gender.value == '男':
-                if waistline.value >= self.standard_waistline:
-                    self.change_font_color_format(waistline)
-                    over_standard_cnt += 1
-                if systolic.value >= self.standard_systolic_blood_pressure:
-                    self.change_font_color_format(systolic)
-                    over_standard_cnt += 1
-                if diastolic.value >= self.standard_diastolic_blood_pressure:
-                    self.change_font_color_format(diastolic)
-                    over_standard_cnt += 1
-                if glucose.value >= self.standard_glucose:
-                    self.change_font_color_format(glucose)
-                    over_standard_cnt += 1
-                if triglycerides.value >= self.standard_triglycerides:
-                    self.change_font_color_format(triglycerides)
-                    over_standard_cnt += 1
-                if hdlc.value < self.hdlc:
-                    self.change_font_color_format(hdlc)
-                    over_standard_cnt += 1
-                if over_standard_cnt >= 3:
-                    self.change_font_color_format(people_name)
+                for key, value in self.column_dict.items():
+                    if isinstance(row[value].value, str):
+                        row[value].value = float(row[value].value)
+                    if key == 'hdlc' and row[value].value < self.standard_dict[key]:
+                        over_standard_cnt += 1
+                        self.change_font_color_format(row[value])
+                    if key != 'hdlc' and row[value].value >= self.standard_dict[key]:
+                        over_standard_cnt += 1
+                        self.change_font_color_format(row[value])
+                    if over_standard_cnt >= 3:
+                        self.change_font_color_format(people_name)
 
             elif gender.value == '女':
-                if waistline.value >= self.standard_waistline-10:
-                    self.change_font_color_format(waistline)
-                    over_standard_cnt += 1
-                if systolic.value >= self.standard_systolic_blood_pressure:
-                    self.change_font_color_format(systolic)
-                    over_standard_cnt += 1
-                if diastolic.value >= self.standard_diastolic_blood_pressure:
-                    self.change_font_color_format(diastolic)
-                    over_standard_cnt += 1
-                if glucose.value >= self.standard_glucose:
-                    self.change_font_color_format(glucose)
-                    over_standard_cnt += 1
-                if triglycerides.value >= self.standard_triglycerides:
-                    self.change_font_color_format(triglycerides)
-                    over_standard_cnt += 1
-                if hdlc.value < self.hdlc+10:
-                    self.change_font_color_format(hdlc)
-                    over_standard_cnt += 1
-                if over_standard_cnt >= 3:
-                    self.change_font_color_format(people_name)
+                for key, value in self.column_dict.items():
+                    if isinstance(row[value].value, str):
+                        row[value].value = float(row[value].value.split('(')[0])
+                    if key == 'waistline' and row[value].value >= self.standard_dict[key]-10:
+                        over_standard_cnt += 1
+                        self.change_font_color_format(row[value])
+                    if key =='hdlc' and row[value].value < self.standard_dict[key]+10:
+                        over_standard_cnt += 1
+                        self.change_font_color_format(row[value])
+                    if key != 'hdlc' and row[value].value >= self.standard_dict[key]:
+                        over_standard_cnt += 1
+                        self.change_font_color_format(row[value])
+                    if over_standard_cnt >= 3:
+                        self.change_font_color_format(people_name)
         return worksheet
     
 
@@ -154,8 +165,11 @@ class Judge_Metabolic_Syndrome:
 
         Including cell's fill, font, color, alignment, dimensions.
         """
-        workbook = openpyxl.load_workbook(self.io)
-        
+        if self.from_summary==False:
+            workbook = openpyxl.load_workbook(self.io)
+        else:
+            workbook = openpyxl.load_workbook(self.save_file_path)
+
         ws1 = workbook['健檢資料']
         ws2 = workbook[self.dst_worksheet]
         # copy format sheet1 header to sheet2 header
@@ -173,7 +187,10 @@ class Judge_Metabolic_Syndrome:
 
 
     def read_file(self):
-        df = pd.read_excel(self.io, sheet_name='健檢資料', engine='openpyxl')
+        if self.from_summary==False:
+            df = pd.read_excel(self.io, sheet_name='健檢資料', engine='openpyxl')
+        else:
+            df = pd.read_excel(self.save_file_path, sheet_name='健檢資料', engine='openpyxl')
         return df
     
     
@@ -189,43 +206,32 @@ class Judge_Metabolic_Syndrome:
         df = df[df['年度代碼'].str.startswith(self.select_years)]
              
         for i in range(len(df.index)):
-            gender = df.iloc[i,self.metabolic_syndrome_column[0]] 
-            waistline = df.iloc[i,self.metabolic_syndrome_column[1]]
-            systolic = df.iloc[i,self.metabolic_syndrome_column[2]]
-            diastolic = df.iloc[i,self.metabolic_syndrome_column[3]]
-            glucose = df.iloc[i,self.metabolic_syndrome_column[4]]
-            triglycerides = df.iloc[i,self.metabolic_syndrome_column[5]]
-            hdlc = df.iloc[i,self.metabolic_syndrome_column[6]]
+            gender = df.iloc[i, self.gender_dict['gender']] 
             over_standard_cnt = 0
             if gender == '男':
-                if waistline >= self.standard_waistline:
-                    over_standard_cnt += 1
-                if systolic >= self.standard_systolic_blood_pressure:
-                    over_standard_cnt += 1
-                if diastolic >= self.standard_diastolic_blood_pressure:
-                    over_standard_cnt += 1
-                if glucose >= self.standard_glucose:
-                    over_standard_cnt += 1
-                if triglycerides >= self.standard_triglycerides:
-                    over_standard_cnt += 1
-                if hdlc < self.hdlc:
-                    over_standard_cnt += 1
+                for key, value in self.column_dict.items():
+                    df_value = df.iloc[i, value]
+                    if isinstance(df_value, str):
+                        df_value = float(df_value)
+                    if key == 'hdlc' and df_value < self.standard_dict[key]:
+                        over_standard_cnt += 1
+                    if key != 'hdlc' and df_value >= self.standard_dict[key]:
+                        over_standard_cnt += 1
                 df.iloc[i, len(df.columns)-1] = over_standard_cnt
                 
             elif gender == '女':
-                if waistline >= self.standard_waistline-10:
-                    over_standard_cnt += 1
-                if systolic >= self.standard_systolic_blood_pressure:
-                    over_standard_cnt += 1
-                if diastolic >= self.standard_diastolic_blood_pressure:
-                    over_standard_cnt += 1
-                if glucose >= self.standard_glucose:
-                    over_standard_cnt += 1
-                if triglycerides >= self.standard_triglycerides:
-                    over_standard_cnt += 1
-                if hdlc < self.hdlc+10:
-                    over_standard_cnt += 1              
+                for key, value in self.column_dict.items():
+                    df_value = df.iloc[i, value]
+                    if isinstance(df_value, str):
+                        df_value = float(df_value.split('(')[0])
+                    if key == 'waistline' and df_value >= self.standard_dict[key]-10:
+                        over_standard_cnt += 1
+                    if key =='hdlc' and df_value < self.standard_dict[key]+10:
+                        over_standard_cnt += 1
+                    if key != 'hdlc' and df_value >= self.standard_dict[key]:
+                        over_standard_cnt += 1   
                 df.iloc[i, len(df.columns)-1] = over_standard_cnt
+
         df = df.sort_values(by=['超過標準數'], ascending=False)
         
         return df
@@ -233,51 +239,54 @@ class Judge_Metabolic_Syndrome:
     
     def save_file_and_copy_title(self, df):
         # 建立一個新的 ExcelWriter 物件
-        writer = pd.ExcelWriter(self.io, mode='a', engine='openpyxl', if_sheet_exists='replace')
+        if self.from_summary == False:
+            writer = pd.ExcelWriter(self.io, mode='a', engine='openpyxl', if_sheet_exists='replace')
+        else:
+            writer = pd.ExcelWriter(self.save_file_path, mode='a', engine='openpyxl', if_sheet_exists='replace')
         df.to_excel(writer, sheet_name=self.dst_worksheet, index=False)
         writer.close() 
-        self.copy_format_from_sheet1()
 
 
     def main_procesdure(self):
         df = self.read_file()
         df = self.process_Metabolic_Syndrome(df)
         self.save_file_and_copy_title(df)
-
+        self.copy_format_from_sheet1()
 
 
 class Metabolic_Syndrome_From_Summary(Judge_Metabolic_Syndrome):
-    def __init__(self, summary_file_fath, select_years, saving_file_path, save_sheet_name):
-        super().__init__()
-        self.summary_file_fath = summary_file_fath
-        self.saving_file_path = saving_file_path
+    def __init__(self, io, select_years, save_sheet_name, save_file_path, from_summary=True):
+        super().__init__(io, select_years, save_sheet_name, save_file_path, from_summary=True)
+        self.io = io
         self.select_years = select_years
         self.save_sheet_name = save_sheet_name
-        self.df = pd.read_excel(summary_file_fath, sheet_name='工作表1', engine='openpyxl')
-        self.df2 = pd.read_excel(saving_file_path, sheet_name='健檢資料', engine='openpyxl')
-        self.goal_column_name = self.df2.columns.tolist()
+        self.save_file_path = save_file_path
+        print(self.from_summary)
         self.main_procesdure()
         
 
     def append_column(self):
+        self.df2 = pd.read_excel(self.save_file_path, sheet_name='健檢資料', engine='openpyxl')
+        self.goal_column_name = self.df2.columns.tolist()
         if 'SGPT' not in self.df2.columns:
             self.df2['SGPT'] = 0
         if 'SGOT' not in self.df2.columns:
-            self.df2['SGOT'] = 0
-        self.goal_column_name = self.df2.columns.tolist()
-        
-        return self.goal_column_name
+            self.df2['SGOT'] = 0    
+        return self.df2.columns.tolist()
     
     def change_column_name(self):
+        df = pd.read_excel(self.io, sheet_name='工作表1', engine='openpyxl')
+        print(df)
         self.goal_column_name = self.append_column()
-        self.df['年度代碼'] = '111年度體檢'
-        self.df['部門代號'] = 'X001'
-        self.df['健檢過程備註說明'] = ''
-        self.df = self.df.drop(labels=0, axis=0)
+        df['年度代碼'] = '111年度體檢'
+        df['部門代號'] = 'X001'
+        df['健檢過程備註說明'] = ''
+        df['出生年月日'] = '2023/1/1'
+        df = df.drop(labels=0, axis=0)
         
-        specific_column = ['年度代碼', '姓名', '工/學號', '部門代號', '部門/科系', '性別', '年齡', '身高', '體重', '腰圍', '收縮壓', '舒張壓', 'AC飯前血糖', 'T-CHO總膽固醇', 'TG三酸甘油脂', 'HDL高密度脂蛋白', 'LDL低密度脂蛋白', '請問您過去一個月內是否有吸菸？', '既往病史', '健檢過程備註說明', 'SGOT血清麩酸草酸轉氨脢', 'SGPT血清麩酸丙銅轉氨脢']
-
-        speific_df = self.df[specific_column].copy()
+        specific_column = ['年度代碼', '姓名', '工/學號', '部門代號', '部門/科系', '性別', '出生年月日', '身高', '體重', '腰圍', '收縮壓', '舒張壓', 'AC飯前血糖', 'T-CHO總膽固醇', 'TG三酸甘油脂', 'HDL高密度脂蛋白', 'LDL低密度脂蛋白', '請問您過去一個月內是否有吸菸？', '既往病史', '健檢過程備註說明', 'SGOT血清麩酸草酸轉氨脢', 'SGPT血清麩酸丙銅轉氨脢']
+        speific_df = df.copy()
+        speific_df = speific_df[specific_column]
         speific_df_columns = speific_df.columns.to_list()
 
         for i in range(len(speific_df_columns)):
@@ -285,24 +294,22 @@ class Metabolic_Syndrome_From_Summary(Judge_Metabolic_Syndrome):
 
         # save the sheet 
         # self.process_Metabolic_Syndrome(io='test.xlsx', select_years=111, dst_worksheet='test1')
-
+        speific_df = speific_df.fillna(0)
         return speific_df
     
     def main_procesdure(self):
-        # writer = pd.ExcelWriter(self.saving_file_path , mode='a', engine='openpyxl', if_sheet_exists='replace')
-        # speific_df.to_excel(writer, sheet_name=self.save_sheet_name, index=False)
-        # writer.close()
         speific_df = self.change_column_name()
         speific_df = self.process_Metabolic_Syndrome(speific_df)
         self.save_file_and_copy_title(speific_df)
+        self.copy_format_from_sheet1()
         print('OK')
         
         
         
     
 def main():
-    # Judge_Metabolic_Syndrome('test.xlsx', '111', '工作表1')
-    Metabolic_Syndrome_From_Summary(summary_file_fath='一般作業總表.xlsx', select_years='111', saving_file_path='test.xlsx', save_sheet_name='test_data')
+    Judge_Metabolic_Syndrome('test.xlsx', '111', '工作表1', None)
+    # Metabolic_Syndrome_From_Summary('一般作業總表.xlsx', '111', 'test_data', save_file_path='test.xlsx')
     # print("Finish")
 
 if __name__ == '__main__':
