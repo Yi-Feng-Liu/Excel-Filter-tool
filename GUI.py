@@ -110,6 +110,7 @@ class Excel_GUI:
         self.greet.destroy()
         self.years_combobox_label.destroy()
         self.sheets_names_combobox_label.destroy()
+        self.save_sheet_name_label.destroy()
         self.select_button.destroy()
         self.label.destroy()
         
@@ -149,7 +150,7 @@ class Excel_GUI:
         self.years_combobox = ttk.Combobox(self.root, values=None, width=27)
         self.years_combobox.place(x=self.combobox_place, y=self.windows_h-187)
         # set entry & save sheet
-        self.save_sheet_name_label = Label(root, text='Sheet Name:', font=self.font, bg=self.bgcolor)
+        self.save_sheet_name_label = Label(root, text='工作表名稱:', font=self.font, bg=self.bgcolor)
         self.save_sheet_name_label.place(x=self.combobox_xlabel_place, y=self.windows_h-160)
         self.defalut_placeholder_message = '輸入要儲存的Sheet名稱'
         self.save_sheet_name_entry = EntryWithPlaceholder(master=root, placeholder=self.defalut_placeholder_message, width=30)
