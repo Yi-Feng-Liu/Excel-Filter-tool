@@ -58,7 +58,7 @@ class Excel_GUI:
         self.years_combobox_label = Label(root, text="", font=self.font, bg=self.bgcolor)
         self.years_entry_label = Label(root, text="", font=self.font, bg=self.bgcolor)
         self.save_sheet_name_label = Label(root, text="", font=self.font, bg=self.bgcolor)
-        self.select_button = Button(root, text="", command=self.openFile)
+        self.select_button = Button(root, text="")
         self.label = Label(root, text="", font=self.font, bg=self.bgcolor)
         self.savelabel= Label(root, text="", font=self.font, bg=self.bgcolor)
         self.save_sheet_name_entry = EntryWithPlaceholder(master=root, placeholder="", width=30)
@@ -142,7 +142,7 @@ class Excel_GUI:
         self.box.place(x=250, y=110, anchor='center')
 
         # set choose file button
-        self.select_button = Button(root, text="選擇檔案", command=self.openFile)
+        self.select_button = Button(root, text="選擇檔案", command=self.open_E_File)
         self.select_button.place(x=225, y=140)
 
         # update choose file path
@@ -259,8 +259,22 @@ class Excel_GUI:
             self.label.config(text=f'沒有選取的檔案!')
             self.comfirm_button["state"] = "disabled"
             self.sheet_comfirm_button["state"] = "disabled"
-        
+    
+    def open_E_File(self):
+        global filepath
 
+        filepath = filedialog.askopenfilename(filetypes=[("Excel files", ".xlsx .xls")])
+        if filepath:
+            self.label.config(text=f'選取的檔案路徑為\n {filepath}')
+            self.comfirm_button["state"] = "active"
+            # get list of sheet names 
+            self.tabs = pd.ExcelFile(filepath).sheet_names 
+            self.sheets_names_combobox['values'] = self.tabs
+        else:
+            self.sheets_names_combobox['values'] = self.empty_ls
+            self.label.config(text=f'沒有選取的檔案!')
+            self.comfirm_button["state"] = "disabled"
+        
     def get_sheet_name(self):
         global sheetName
         sheetName = self.sheets_names_combobox.get()
@@ -317,12 +331,16 @@ class Excel_GUI:
         save_sheet = self.save_sheet_name_entry.get()
         if save_sheet in self.tabs:
             messagebox.showerror(title='Error', message='工作表名稱已存在')
+        elif len(sheetName)==0 :
+            messagebox.showerror(title='Error', message='請選擇工作表')
+        elif sheetName not in self.tabs:
+            messagebox.showerror(title='Error', message='工作表不存在')
         elif save_sheet == self.defalut_placeholder_message and years_text == self.defalut_years_placeholder_message:
             messagebox.showerror(title='Error', message='年度代碼 & 儲存的工作表名稱不可空白')
-        elif save_sheet == self.defalut_placeholder_message:
-            messagebox.showerror(title='Error', message='儲存的工作表名稱不可空白')
         elif years_text == self.defalut_years_placeholder_message:
             messagebox.showerror(title='Error', message='年度代碼不可空白')
+        elif save_sheet == self.defalut_placeholder_message:
+            messagebox.showerror(title='Error', message='儲存的工作表名稱不可空白')
         else:
             try:
                 types = self.box.get()
