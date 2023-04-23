@@ -315,8 +315,8 @@ class Metabolic_Syndrome_From_Summary(Judge_Metabolic_Syndrome):
     def __init__(self, io, tab, save_sheet_name, years_text, from_summary=True):
         super().__init__(io, tab, save_sheet_name, years_text)
         self.io = io
+        self.dst_worksheet = save_sheet_name
         self.years_text = years_text
-        self.save_sheet_name = save_sheet_name
         self.from_summary = from_summary
 
     def change_column_name(self):

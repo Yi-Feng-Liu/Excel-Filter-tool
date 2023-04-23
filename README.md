@@ -17,6 +17,7 @@ On the GUI, the sheet 1 means you want to process sheet and the sheet 2 is means
 
 > 5. Check the result is you want, if not please contact me.
 
-
+> Type this command in console
+> pyinstaller --onefile -w --icon=Images/app_icon.ico run.py --name "Excel Filter Tool" --add-data "util/*py;util" --add-data   "Images/*jpg;Images"
 
 

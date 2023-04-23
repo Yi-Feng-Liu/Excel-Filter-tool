@@ -79,7 +79,7 @@ class Excel_GUI:
         self.attributes = root.attributes('-alpha', 1)
 
         # set the app icon
-        self.iconimg = self.getIcon('Images/icon.jpg')
+        self.iconimg = self.getIcon('Images\\icon.jpg')
         root.iconphoto(True, self.iconimg)
         root.configure(bg=self.bgcolor)
         # set app title
@@ -89,7 +89,7 @@ class Excel_GUI:
         self.select_input_file_type()
         
         # set decoraction position
-        self.origin_img_path = self.resize('Images/link_img.jpg', resize_w=100, resize_h=100, changeBG=True)
+        self.origin_img_path = self.resize(resource_path('Images\\link_img.jpg'), resize_w=100, resize_h=100, changeBG=True)
         self.decoration = self.getIcon(self.origin_img_path)
         width = self.decoration.width()
         height = self.decoration.height()
@@ -102,7 +102,7 @@ class Excel_GUI:
 
     def create_confirm_botton(self, command):
         # set the confirm button using image
-        self.button_img = self.resize('Images/confirm.jpg', resize_w=70, resize_h=60, changeBG=False)
+        self.button_img = self.resize('Images\\confirm.jpg', resize_w=70, resize_h=60, changeBG=False)
         self.button_img = Image.open(resource_path(self.button_img))
         self.comfirm_button_img = ImageTk.PhotoImage(self.button_img) 
         self.comfirm_button = Button(self.root, command=command, image=self.comfirm_button_img)
@@ -240,12 +240,14 @@ class Excel_GUI:
     def resize(self, imgpath:str, resize_w:int, resize_h:int, changeBG=True):
         image_name = imgpath.split("\\")[-1].split(".")[0]
         
-        origin_img = cv.imread(imgpath)
+        origin_img = cv.imread(resource_path(imgpath))
         # replace the iamge white background to #d2efd3
         if changeBG:
-            origin_img[np.where((origin_img == [255, 255, 255]).all(axis=2))] = [211, 239, 211]
+            if origin_img.ndim > 0:
+                mask = np.logical_and.reduce(origin_img == 255, axis=2)
+                origin_img[mask] = [211, 239, 211]
         resize_img = cv.resize(origin_img, (resize_w, resize_h))
-        save_path = f'Images/{image_name}_resize.jpg'
+        save_path = resource_path(f'Images/{image_name}_resize.jpg')
         cv.imwrite(save_path, resize_img)
         return save_path
 
@@ -262,7 +264,7 @@ class Excel_GUI:
             self.label.config(text=f'選取的檔案路徑為\n {filepath}')
             self.comfirm_button["state"] = "active"
             # get list of sheet names 
-            self.tabs = pd.ExcelFile(filepath).sheet_names 
+            self.tabs = pd.ExcelFile(resource_path(filepath)).sheet_names 
             self.sheets_names_combobox['values'] = self.tabs
             self.sheet_comfirm_button["state"] = "active"
         else:
@@ -279,7 +281,7 @@ class Excel_GUI:
             self.label.config(text=f'選取的檔案路徑為\n {filepath}')
             self.comfirm_button["state"] = "active"
             # get list of sheet names 
-            self.tabs = pd.ExcelFile(filepath).sheet_names 
+            self.tabs = pd.ExcelFile(resource_path(filepath)).sheet_names 
             self.sheets_names_combobox['values'] = self.tabs
         else:
             self.sheets_names_combobox['values'] = self.empty_ls
