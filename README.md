@@ -3,7 +3,7 @@
 A tool used to filter Excel file and will create the new worksheet that you need to key in the entry. 
  
 
-### **If name of sheet name dose not exist, it will be auto created and save it. The combobox you can select the type which you want to filter. **
+### *If name of sheet name dose not exist, it will be auto created and save it. The combobox you can select the type which you want to filter.*
 
 # Method
 
@@ -37,7 +37,6 @@ To run this program, your virtual environment will need the following modules.
 
     pyinstaller --onefile -w --icon=Images/app_icon.ico run.py --name "Excel Filter Tool" --add-data "util/*py;util" --add-data   "Images/*jpg;Images"
 
--w is make tha console execute in background
 
 
 
