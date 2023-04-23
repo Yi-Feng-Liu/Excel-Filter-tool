@@ -1,6 +1,9 @@
-# Excel-Filter-Tool version 1.0(This tool made for Lyra)
+# Excel-Filter-Tool  (This tool made for Lyra)
 
-A tool used to filter Excel file and will create the new worksheet that you need to key in the entry. 
+
+version 1.0:
+
+A tool used to filter and Judge Metabolic Syndrome Excel file and will create the new worksheet that you need to key in the entry. 
  
 
 ### *If name of sheet name dose not exist, it will be auto created and save it. The combobox you can select the type which you want to filter.*
