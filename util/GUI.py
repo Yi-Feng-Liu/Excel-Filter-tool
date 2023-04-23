@@ -2,14 +2,25 @@ from tkinter import *
 import pandas as pd
 from PIL import Image, ImageTk 
 import cv2 as cv
+import os, sys
 from tkinter import filedialog, messagebox
 from tkinter.font import Font
-import threading
 from tkinter import ttk
 import numpy as np
-from process import Judge_Metabolic_Syndrome, Metabolic_Syndrome_From_Summary
+from util.process import Judge_Metabolic_Syndrome, Metabolic_Syndrome_From_Summary
 import webbrowser
 
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+ 
+    return os.path.join(base_path, relative_path)
 
 class EntryWithPlaceholder(Entry):
     def __init__(self, master=None, placeholder="PLACEHOLDER", color='grey', width=30):
@@ -68,7 +79,7 @@ class Excel_GUI:
         self.attributes = root.attributes('-alpha', 1)
 
         # set the app icon
-        self.iconimg = self.getIcon('icon.jpg')
+        self.iconimg = self.getIcon('Images/icon.jpg')
         root.iconphoto(True, self.iconimg)
         root.configure(bg=self.bgcolor)
         # set app title
@@ -78,7 +89,7 @@ class Excel_GUI:
         self.select_input_file_type()
         
         # set decoraction position
-        self.origin_img_path = self.resize('link_img.jpg', resize_w=100, resize_h=100, changeBG=True)
+        self.origin_img_path = self.resize('Images/link_img.jpg', resize_w=100, resize_h=100, changeBG=True)
         self.decoration = self.getIcon(self.origin_img_path)
         width = self.decoration.width()
         height = self.decoration.height()
@@ -91,8 +102,8 @@ class Excel_GUI:
 
     def create_confirm_botton(self, command):
         # set the confirm button using image
-        self.button_img = self.resize('confirm.jpg', resize_w=70, resize_h=60, changeBG=False)
-        self.button_img = Image.open(self.button_img)
+        self.button_img = self.resize('Images/confirm.jpg', resize_w=70, resize_h=60, changeBG=False)
+        self.button_img = Image.open(resource_path(self.button_img))
         self.comfirm_button_img = ImageTk.PhotoImage(self.button_img) 
         self.comfirm_button = Button(self.root, command=command, image=self.comfirm_button_img)
         self.comfirm_button.place(x=self.windows_w-250, y=self.windows_h-50, anchor='center')
@@ -234,7 +245,7 @@ class Excel_GUI:
         if changeBG:
             origin_img[np.where((origin_img == [255, 255, 255]).all(axis=2))] = [211, 239, 211]
         resize_img = cv.resize(origin_img, (resize_w, resize_h))
-        save_path = f'{image_name}_resize.jpg'
+        save_path = f'Images/{image_name}_resize.jpg'
         cv.imwrite(save_path, resize_img)
         return save_path
 
@@ -353,7 +364,7 @@ class Excel_GUI:
                 messagebox.showerror(title="錯誤", message=e)
 
     def getIcon(self, img_path):
-        img = Image.open(img_path)
+        img = Image.open(resource_path(img_path))
         icon = ImageTk.PhotoImage(img) 
         return icon
     

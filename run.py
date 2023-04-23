@@ -1,5 +1,5 @@
 import tkinter as tk
-from GUI import Excel_GUI
+from util.GUI import Excel_GUI
 
 
 def main():
