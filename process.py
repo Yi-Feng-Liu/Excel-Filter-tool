@@ -345,14 +345,7 @@ class Metabolic_Syndrome_From_Summary(Judge_Metabolic_Syndrome):
         speific_df = self.process_Metabolic_Syndrome(speific_df)
         self.save_file_and_copy_title(speific_df)
         self.copy_format_from_sheet1()
-        print('OK')
-        
-        
-        
-    
-def main():
-    # Metabolic_Syndrome_From_Summary('111 (1).xlsx', '111 年度健檢', 'test_data', years_text='111年度健檢').main_procesdure()
-    Judge_Metabolic_Syndrome('test.xlsx', '健檢資料', '111', '123').main_procesdure()
 
-if __name__ == '__main__':
-    main()
+        
+        
+        

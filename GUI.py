@@ -94,7 +94,7 @@ class Excel_GUI:
         self.button_img = self.resize('confirm.jpg', resize_w=70, resize_h=60, changeBG=False)
         self.button_img = Image.open(self.button_img)
         self.comfirm_button_img = ImageTk.PhotoImage(self.button_img) 
-        self.comfirm_button = Button(root, command=command, image=self.comfirm_button_img)
+        self.comfirm_button = Button(self.root, command=command, image=self.comfirm_button_img)
         self.comfirm_button.place(x=self.windows_w-250, y=self.windows_h-50, anchor='center')
         self.comfirm_button["state"] = "disabled"
 
@@ -131,45 +131,45 @@ class Excel_GUI:
         self.initialize_button_and_label()
         self.sheet_comfirm_button.destroy()
         
-        self.greet = Label(root, text="類型", height="3", bg=self.bgcolor, font=self.font)
+        self.greet = Label(self.root, text="選擇判斷類型", height="3", bg=self.bgcolor, font=self.font)
         self.greet.place(x=250, y=85, anchor='center')
         
         # create combobox
         self.options = ['代謝症候群']
-        self.box = ttk.Combobox(root, values=self.options)
+        self.box = ttk.Combobox(self.root, values=self.options)
         # use default
         self.box.current()
         self.box.place(x=250, y=110, anchor='center')
 
         # set choose file button
-        self.select_button = Button(root, text="選擇檔案", command=self.open_E_File)
+        self.select_button = Button(self.root, text="選擇檔案", command=self.open_E_File)
         self.select_button.place(x=225, y=140)
 
         # update choose file path
-        self.label = Label(root, text='', font=self.font, bg=self.bgcolor)
+        self.label = Label(self.root, text='', font=self.font, bg=self.bgcolor)
         self.label.place(x=250, y=210, anchor='center')
         
         self.combobox_xlabel_place = 30
         self.combobox_place = 150
-        self.sheets_names_combobox_label = Label(root, text='Process Sheet:', font=self.font, bg=self.bgcolor)
+        self.sheets_names_combobox_label = Label(self.root, text='Process Sheet:', font=self.font, bg=self.bgcolor)
         self.sheets_names_combobox_label.place(x=self.combobox_xlabel_place, y=self.windows_h-250)
         self.sheets_names_combobox = ttk.Combobox(self.root, values=None, width=27)
         self.sheets_names_combobox.place(x=self.combobox_place, y=self.windows_h-247)
 
         # set years combobox
-        self.years_entry_label = Label(root, text='年度代碼:', font=self.font, bg=self.bgcolor)
+        self.years_entry_label = Label(self.root, text='年度代碼:', font=self.font, bg=self.bgcolor)
         self.years_entry_label.place(x=self.combobox_xlabel_place, y=self.windows_h-220)
         self.defalut_years_placeholder_message = '輸入年度代碼名稱 (Ex: 111年度健檢)'
-        self.years_text_entry = EntryWithPlaceholder(master=root, placeholder=self.defalut_years_placeholder_message, width=30)
+        self.years_text_entry = EntryWithPlaceholder(master=self.root, placeholder=self.defalut_years_placeholder_message, width=30)
         self.years_text_entry.place(x=self.combobox_place, y=self.windows_h-217)
 
-        self.save_sheet_name_label = Label(root, text='工作表名稱:', font=self.font, bg=self.bgcolor)
+        self.save_sheet_name_label = Label(self.root, text='工作表名稱:', font=self.font, bg=self.bgcolor)
         self.save_sheet_name_label.place(x=self.combobox_xlabel_place, y=self.windows_h-190)
         self.defalut_placeholder_message = '輸入要儲存的Sheet名稱'
-        self.save_sheet_name_entry = EntryWithPlaceholder(master=root, placeholder=self.defalut_placeholder_message, width=30)
+        self.save_sheet_name_entry = EntryWithPlaceholder(master=self.root, placeholder=self.defalut_placeholder_message, width=30)
         self.save_sheet_name_entry.place(x=self.combobox_place, y=self.windows_h-187)
 
-        self.savelabel= Label(root, text='', font=self.font, bg=self.bgcolor)
+        self.savelabel= Label(self.root, text='', font=self.font, bg=self.bgcolor)
         self.savelabel.place(x=250, y=370, anchor='center')
         self.create_confirm_botton(command=self.process_Excel_from_E_file)
         # self.comfirm_button = Button(root, command=self.process_Excel_from_E_file, image=self.comfirm_button_img)
@@ -180,46 +180,46 @@ class Excel_GUI:
         """
         self.initialize_button_and_label()
         
-        self.greet = Label(root, text="選擇判斷類型", height="3", bg=self.bgcolor, font=self.font)
+        self.greet = Label(self.root, text="選擇判斷類型", height="3", bg=self.bgcolor, font=self.font)
         self.greet.place(x=250, y=85, anchor='center')
         
         # create combobox
         self.options = ['代謝症候群']
-        self.box = ttk.Combobox(root, values=self.options)
+        self.box = ttk.Combobox(self.root, values=self.options)
 
         # use default
         self.box.current()
         self.box.place(x=250, y=110, anchor='center')
 
         # set choose file button
-        self.select_button = Button(root, text="選擇檔案", command=self.openFile)
+        self.select_button = Button(self.root, text="選擇檔案", command=self.openFile)
         self.select_button.place(x=225, y=140)
 
         # update choose file path
-        self.label = Label(root, text='', font=self.font, bg=self.bgcolor)
+        self.label = Label(self.root, text='', font=self.font, bg=self.bgcolor)
         self.label.place(x=250, y=210, anchor='center')
         
         self.combobox_xlabel_place = 47
         self.combobox_place = 150
-        self.sheets_names_combobox_label = Label(root, text='Select Sheet:', font=self.font, bg=self.bgcolor)
+        self.sheets_names_combobox_label = Label(self.root, text='Select Sheet:', font=self.font, bg=self.bgcolor)
         self.sheets_names_combobox_label.place(x=self.combobox_xlabel_place, y=self.windows_h-250)
         self.sheets_names_combobox = ttk.Combobox(self.root, values=None, width=27)
         self.sheets_names_combobox.place(x=self.combobox_place, y=self.windows_h-247)
 
         # set years combobox
-        self.years_combobox_label = Label(root, text='Select Years:', font=self.font, bg=self.bgcolor)
+        self.years_combobox_label = Label(self.root, text='Select Years:', font=self.font, bg=self.bgcolor)
         self.years_combobox_label.place(x=self.combobox_xlabel_place, y=self.windows_h-220)
         self.years_combobox = ttk.Combobox(self.root, values=None, width=27)
         self.years_combobox.place(x=self.combobox_place, y=self.windows_h-217)
         # set entry & save sheet
-        self.save_sheet_name_label = Label(root, text='Sheet Name:', font=self.font, bg=self.bgcolor)
+        self.save_sheet_name_label = Label(self.root, text='Sheet Name:', font=self.font, bg=self.bgcolor)
         self.save_sheet_name_label.place(x=self.combobox_xlabel_place, y=self.windows_h-190)
         self.defalut_placeholder_message = '輸入要儲存的Sheet名稱'
-        self.save_sheet_name_entry = EntryWithPlaceholder(master=root, placeholder=self.defalut_placeholder_message, width=30)
+        self.save_sheet_name_entry = EntryWithPlaceholder(master=self.root, placeholder=self.defalut_placeholder_message, width=30)
         self.save_sheet_name_entry.place(x=self.combobox_place, y=self.windows_h-187)
 
         # set sheet comfirm button
-        self.sheet_comfirm_button = Button(root, text="Submit", command=self.get_sheet_name)
+        self.sheet_comfirm_button = Button(self.root, text="Submit", command=self.get_sheet_name)
         self.sheet_comfirm_button.pack()
         self.sheet_comfirm_button.place(x=390, y=self.windows_h-238, anchor='center')
         self.sheet_comfirm_button["state"] = "disabled"
@@ -367,7 +367,7 @@ class Excel_GUI:
         
     
  
-import tkinter as tk
-root = tk.Tk()
-Excel_GUI(root)
-root.mainloop() 
+# import tkinter as tk
+# root = tk.Tk()
+# Excel_GUI(root)
+# root.mainloop() 
