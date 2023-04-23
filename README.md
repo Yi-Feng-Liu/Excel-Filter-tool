@@ -1,7 +1,7 @@
-# Excel-Filter-Tool (This tool is made for Lyra)
+# Excel-Filter-Tool version 1.0(This tool made for Lyra)
 
-The tool used to filter excel file and will create the new worksheet that you need to key in second entry. 
-On the GUI, the sheet 1 means you want to process sheet and the sheet 2 is means what name of sheet you want to save. 
+A tool used to filter Excel file and will create the new worksheet that you need to key in the entry. 
+ 
 
 ### **If name of sheet name dose not exist, it will be auto created and save it. The combobox you can select the type which you want to filter. **
 
@@ -9,7 +9,7 @@ On the GUI, the sheet 1 means you want to process sheet and the sheet 2 is means
 
 > 1. Select the type you want to filter.
 
-> 2. Click the choose file button to select file.
+> 2. Click the choose file button to select file. If you see the submit button, pleat click it.
 
 > 3. Please enter the names of sheet you want to process and save, respectively.
 
@@ -17,9 +17,28 @@ On the GUI, the sheet 1 means you want to process sheet and the sheet 2 is means
 
 > 5. Check the result is you want, if not please contact me.
 
-> Let Python application and all its dependencies into a single package
+# Environment
+
+To run this program, your virtual environment will need the following modules.
+
+1. pandas
+
+2. numpy
+
+3. openpyxl
+
+4. tkinter
+
+5. openCV
+
+6. PIL
+
+> Let all its dependencies into a single package:
 
     pyinstaller --onefile -w --icon=Images/app_icon.ico run.py --name "Excel Filter Tool" --add-data "util/*py;util" --add-data   "Images/*jpg;Images"
+
+-w is make tha console execute in background
+
 
 
 
