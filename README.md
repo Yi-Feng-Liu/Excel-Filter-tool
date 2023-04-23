@@ -19,7 +19,7 @@ On the GUI, the sheet 1 means you want to process sheet and the sheet 2 is means
 
 > Let Python application and all its dependencies into a single package
 
->>  pyinstaller --onefile -w --icon=Images/app_icon.ico run.py --name "Excel Filter Tool" --add-data "util/*py;util" --add-data   "Images/*jpg;Images"
+    pyinstaller --onefile -w --icon=Images/app_icon.ico run.py --name "Excel Filter Tool" --add-data "util/*py;util" --add-data   "Images/*jpg;Images"
 
 
 
