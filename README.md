@@ -3,7 +3,7 @@
 The tool used to filter excel file and will create the new worksheet that you need to key in second entry. 
 On the GUI, the sheet 1 means you want to process sheet and the sheet 2 is means what name of sheet you want to save. 
 
-### **If name of sheet 2 is not exist, it will be auto created and save it. The combobox you can select the type which you want to filter.**
+### **If name of sheet name dose not exist, it will be auto created and save it. The combobox you can select the type which you want to filter. **
 
 # Method
 
@@ -17,7 +17,9 @@ On the GUI, the sheet 1 means you want to process sheet and the sheet 2 is means
 
 > 5. Check the result is you want, if not please contact me.
 
-> Type this command in console
-> pyinstaller --onefile -w --icon=Images/app_icon.ico run.py --name "Excel Filter Tool" --add-data "util/*py;util" --add-data   "Images/*jpg;Images"
+> Let Python application and all its dependencies into a single package
+
+>>  pyinstaller --onefile -w --icon=Images/app_icon.ico run.py --name "Excel Filter Tool" --add-data "util/*py;util" --add-data   "Images/*jpg;Images"
+
 
 
