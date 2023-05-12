@@ -1,0 +1,22 @@
+{
+    "Metabolic_Syndrome":{
+        
+        "column_dict":{
+            "waistline":9,
+            "systolic":10,
+            "diastolic":11,
+            "glucose":12,
+            "triglycerides":14,
+            "hdlc":15
+        },
+
+        "Male_standard":{
+            "waistline": 90,
+            "systolic": 130,
+            "diastolic": 85,
+            "glucose":100,
+            "triglycerides":150,
+            "hdlc": 40
+        }
+    }   
+}

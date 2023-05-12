@@ -3,6 +3,8 @@ import pandas as pd
 from openpyxl.styles import Font, PatternFill
 from openpyxl.styles import Alignment, numbers
 import copy
+import json
+from json import load
 
 
 class Judge_Metabolic_Syndrome:
@@ -17,22 +19,34 @@ class Judge_Metabolic_Syndrome:
         self.font_type = Font(name='Calibri')
         self.from_summary = from_summary
         self.gender_dict = {'gender': 5}
-        self.column_dict={
-            'waistline':9,
-            'systolic':10,
-            'diastolic':11,
-            'glucose':12,
-            'triglycerides':14,
-            'hdlc':15
-        }
-        self.standard_dict={
-            'waistline': 90,
-            'systolic': 130,
-            'diastolic': 85,
-            'glucose':100,
-            'triglycerides':150,
-            'hdlc': 40
-        }   
+        self.column_dict, self.standard_dict = self.get_json_data()
+
+        # self.column_dict={
+        #     'waistline':9,
+        #     'systolic':10,
+        #     'diastolic':11,
+        #     'glucose':12,
+        #     'triglycerides':14,
+        #     'hdlc':15
+        # }
+        # self.standard_dict={
+        #     'waistline': 90,
+        #     'systolic': 130,
+        #     'diastolic': 85,
+        #     'glucose':100,
+        #     'triglycerides':150,
+        #     'hdlc': 40
+        # }   
+
+
+    def get_json_data(self):
+        with open("./types.json") as f:
+            data = json.load(f)
+        
+        Metabolic_Syndrome = data['Metabolic_Syndrome']
+        column_dict = Metabolic_Syndrome['column_dict']
+        standard_dict = Metabolic_Syndrome['Male_standard']
+        return column_dict, standard_dict
 
 
     def change_date_time(self, worksheet, number_of_column):
@@ -244,7 +258,7 @@ class Judge_Metabolic_Syndrome:
             df = df[df['年度代碼'].str.startswith(self.years_text)]
              
         for i in range(len(df.index)):
-            name = df.iloc[i, 1] 
+            # name = df.iloc[i, 1] 
             gender = df.iloc[i, self.gender_dict['gender']] 
             over_standard_cnt = 0
             if gender == '男':
