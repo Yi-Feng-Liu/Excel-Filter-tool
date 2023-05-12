@@ -33,7 +33,7 @@ class Judge_Metabolic_Syndrome:
 
 
     def get_json_data(self):
-        with open(self.resource_path("./types.json")) as f:
+        with open(self.resource_path("util/types.json"), encoding="utf-8") as f:
             data = json.load(f)
         return data
 
@@ -375,6 +375,10 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         self.years_text = years_text
 
 
+    def __call__(self):
+        pass
+
+
     def change_column_name(self, df:pd.DataFrame, goal_column_name:str):
         """The original column order should be same as goal column, this function only change the name of original column to goal.
         """
@@ -385,10 +389,18 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         return speific_df
 
 
-    def read_file(self):
+    def get_work_pressure_dict(self):
+        data = self.get_json_data()
+        work_pressure_dict = data['Work_Pressure']
+        self.tired_level = work_pressure_dict['tired_level']
+        self.work_time_level = work_pressure_dict['work_time_level']
+        self.sentimental_level = work_pressure_dict['sentimental_level']
+
+
+    def read_file_and_change_col_name(self):
         self.df = pd.read_excel('C:\\Users\\acer\\Desktop\\source.xlsx', sheet_name='工作表1', engine='openpyxl')
         self.df.drop(labels=['歸屬廠區', '單位', '工作班別'], axis=1, inplace=True)
-
+        # add column & let's order same as template
         self.df.insert(0, '年度代碼', value='113')
         self.df.insert(9, 'I_Score', value=0)
         self.df.insert(10, 'I_Risk', value=0)
@@ -397,12 +409,96 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         self.df.insert(22, '工作型態內容說明', value='無')
         self.df.insert(23, '工作負荷等級', value=0)
 
-
         target_col = ['年度代碼', '姓名', '員工編號', 'I01', 'I02', 'I03', 'I04', 'I05', 'I06', 'I_Score', 'I_Risk', 'J01', 'J02', 'J03', 'J04','J05', 'J06', 'J07', 'J_Score', 'J_Risk', '月加班時數等級', '工作型態評估等級', '工作型態內容說明', '工作負荷等級']
-
         self.df = self.change_column_name(self.df, target_col)
+        return self.df
 
 
+    def procrss_name_col(self):
+        self.df['姓名'] = self.df['姓名'].apply(lambda x: x.split(","))
 
 
-Judge_Work_Pressure(1,1,1,1).read_file()
+    def calculate_level(self, df, *args):
+        sum_series = 0
+        for i in args:
+            sum_series += (5 - df[i])
+        series_value = (25*sum_series)/len(args)
+        return series_value
+
+
+    def chage_series_text_to_value(self):
+        self.get_work_pressure_dict()
+        self.df = self.read_file_and_change_col_name()
+        # change I columns value
+        for i in self.df.iloc[:, 3:9]:
+            series_i = self.df[i]
+            self.df[i] = series_i.apply(lambda x: self.tired_level.get(x))
+        # change J columns value
+        for j in self.df.iloc[:, 11:14]:
+            series_j = self.df[j]
+            self.df[j] = series_j.apply(lambda x: self.sentimental_level.get(x))
+        for j in self.df.iloc[:, 14:18]:
+            series_j = self.df[j]
+            self.df[j] = series_j.apply(lambda x: self.tired_level.get(x))
+        # change 月加班時數等級 value
+        self.df.iloc[:, 20] = self.df.iloc[:, 20].apply(lambda x: self.work_time_level.get(x))
+ 
+
+    def insert_score_value(self):
+        self.chage_series_text_to_value()
+        I_Score_value = self.calculate_level(self.df, 'I01', 'I02', 'I03', 'I04', 'I05', 'I06')
+        J_Score_value = self.calculate_level(self.df, 'J01', 'J02', 'J03', 'J04', 'J05', 'J06', 'J07')
+        self.df['I_Score'] = I_Score_value.apply(lambda x: f'{x:.1f}').astype(float)
+        self.df['J_Score'] = J_Score_value.apply(lambda x: f'{x:.1f}').astype(float)
+        
+
+    def insert_risk_value(self):
+        self.insert_score_value()
+        # insert value to I_Risk by score condition
+        for i in range(len(self.df['I_Score'])):
+            if self.df['I_Score'][i] <= 50:
+                self.df.loc[i, 'I_Risk'] = 0
+            elif self.df['I_Score'][i] >= 70:
+                self.df.loc[i, 'I_Risk'] = 2
+            else:
+                self.df.loc[i, 'I_Risk'] = 1
+
+        for j in range(len(self.df['J_Score'])):
+            if self.df['J_Score'][j] <= 45:
+                self.df.loc[j, 'J_Risk'] = 0
+            elif self.df['J_Score'][j] >= 60:
+                self.df.loc[j, 'J_Risk'] = 2
+            else:
+                self.df.loc[j, 'J_Risk'] = 1
+
+
+    def insert_work_loading_level(self):
+        self.insert_risk_value()
+        # 插入工作型態評估等級, Condiction from , I & J Risk, 月加班時數等級
+        for i in range(len(self.df.index)):
+            I_Risk_value = self.df.loc[i, 'I_Risk']
+            J_Risk_value = self.df.loc[i, 'J_Risk'] 
+            work_time_level = self.df.loc[i, '月加班時數等級'] 
+            loading_level = max(I_Risk_value, J_Risk_value, work_time_level)
+            self.df.loc[i, '工作負荷等級'] = loading_level
+
+    
+    def process_work_type_to_level(self, x):
+        x = x.split(";")
+        for i in range(len(x)):
+            if x[i] == '無以下特殊形態之工作':
+                x[i] = ""
+        while "" in x:
+            x.remove("")
+        return len(x)
+
+
+    def insert_work_type_level(self):
+        self.insert_work_loading_level()
+        self.df['工作型態評估等級'] = self.df['工作型態評估等級'].apply(lambda x: self.process_work_type_to_level(x))
+        print(self.df['工作型態評估等級'])
+            
+
+    
+
+Judge_Work_Pressure(1,1,1,1).insert_work_type_level()
