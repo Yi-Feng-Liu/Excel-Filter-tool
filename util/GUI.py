@@ -22,6 +22,7 @@ def resource_path(relative_path):
  
     return os.path.join(base_path, relative_path)
 
+
 class EntryWithPlaceholder(Entry):
     def __init__(self, master=None, placeholder="PLACEHOLDER", color='grey', width=30):
         super().__init__(master)
@@ -47,7 +48,8 @@ class EntryWithPlaceholder(Entry):
     def foc_out(self, *args):
         if not self.get():
             self.put_placeholder()
-            
+
+
 class Excel_GUI:
     def __init__(self, root):
         self.root = root
@@ -109,6 +111,7 @@ class Excel_GUI:
         self.comfirm_button.place(x=self.windows_w-250, y=self.windows_h-50, anchor='center')
         self.comfirm_button["state"] = "disabled"
 
+
     def select_input_file_type(self):
         # global 
         methods = [
@@ -146,7 +149,7 @@ class Excel_GUI:
         self.greet.place(x=250, y=85, anchor='center')
         
         # create combobox
-        self.options = ['代謝症候群']
+        self.options = ['代謝症候群', '工作過勞量表']
         self.box = ttk.Combobox(self.root, values=self.options)
         # use default
         self.box.current()
@@ -327,7 +330,7 @@ class Excel_GUI:
             try:
                 types = self.box.get()
                 if types == self.options[0]:
-                    Judge_Metabolic_Syndrome(io=filepath, tab=sheetName, select_years=select_year, save_sheet_name=save_sheet).main_procesdure()
+                    Judge_Metabolic_Syndrome(io=filepath, src_worksheet=sheetName, select_years=select_year, save_sheet_name=save_sheet).main_procesdure()
 
                     self.finishInfo()
                 else:
@@ -358,7 +361,7 @@ class Excel_GUI:
             try:
                 types = self.box.get()
                 if types == self.options[0]:
-                    Metabolic_Syndrome_From_Summary(io=filepath, tab=sheetName, save_sheet_name=save_sheet, years_text=years_text).main_procesdure()
+                    Metabolic_Syndrome_From_Summary(io=filepath, src_worksheet=sheetName, save_sheet_name=save_sheet, years_text=years_text).main_procesdure()
                     self.finishInfo()
                 else:
                     messagebox.showerror(title="錯誤", message="請選擇檔案類型")
