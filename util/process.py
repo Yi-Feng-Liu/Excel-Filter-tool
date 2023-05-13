@@ -509,10 +509,21 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         return len(x)
 
 
+    def judge_work_type_level(self, x):
+        if x >= 0 and x <= 1:
+            return 0
+        elif x >= 2 and x <= 3:
+            return 1
+        elif x >= 4:
+            return 2
+        
+
+
     def insert_work_type_level_and_save(self):
         self.insert_work_loading_level()
         self.df['工作型態評估等級'] = self.df['工作型態評估等級'].apply(lambda x: self.process_work_type_to_level(x))
-        self.df = self.df.sort_values(by=['工作負荷等級'], ascending=False)
+        self.df['工作型態評估等級'] = self.df['工作型態評估等級'].apply(lambda x: self.judge_work_type_level(x))
+        # print(max(self.df['工作型態評估等級']))
         self.save_file_to_excel(self.df)
         print('Save Successfully')
 
@@ -586,5 +597,5 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
 
     
 
-# a = Judge_Work_Pressure('C:\\Users\\acer\\Desktop\\source.xlsx', '工作表1', 'test', '113體檢')
-# a()
+a = Judge_Work_Pressure('C:\\Users\\acer\\Desktop\\source.xlsx', '工作表1', 'test2', '112體檢')
+a()
