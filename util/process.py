@@ -520,8 +520,7 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         self.df['工作型態評估等級'] = self.df['工作型態評估等級'].apply(lambda x: self.judge_work_type_level(x))
         # print(max(self.df['工作型態評估等級']))
         self.save_file_to_excel(self.df)
-        print('Save Successfully')
-
+    
 
     def set_specific_column_format(self, worksheet:str, eng_column:str, width=10, only_change_font_color=False, **kwargs):
         """set the specific column format.
@@ -585,8 +584,7 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
                 ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name, width=20, cell_color='0070C0')
         
         ws2 = self.place_center(worksheet=ws2)
-        workbook.save(self.io)
-        print("saved")        
+        workbook.save(self.io)      
 
 
 
