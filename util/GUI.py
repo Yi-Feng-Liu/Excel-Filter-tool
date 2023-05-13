@@ -330,7 +330,8 @@ class Excel_GUI:
             try:
                 types = self.box.get()
                 if types == self.options[0]:
-                    Judge_Metabolic_Syndrome(io=filepath, src_worksheet=sheetName, select_years=select_year, save_sheet_name=save_sheet).main_procesdure()
+                    run_jms = Judge_Metabolic_Syndrome(io=filepath, src_worksheet=sheetName, select_years=select_year, save_sheet_name=save_sheet)
+                    run_jms()
                     self.finishInfo()
                 else:
                     messagebox.showerror(title="錯誤", message="請選擇檔案類型")
@@ -360,7 +361,8 @@ class Excel_GUI:
             try:
                 types = self.box.get()
                 if types == self.options[0]:
-                    Metabolic_Syndrome_From_Summary(io=filepath, src_worksheet=sheetName, save_sheet_name=save_sheet, years_text=years_text).main_procesdure()
+                    run_metabolic_syndrome = Metabolic_Syndrome_From_Summary(io=filepath, src_worksheet=sheetName, save_sheet_name=save_sheet, years_text=years_text)
+                    run_metabolic_syndrome()
                     self.finishInfo()
                 elif types == self.options[1]:
                     run = Judge_Work_Pressure(io=filepath, src_worksheet=sheetName, save_sheet_name=save_sheet, years_text=years_text)

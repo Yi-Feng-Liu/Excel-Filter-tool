@@ -20,7 +20,14 @@ class Judge_Metabolic_Syndrome:
         self.font_type = Font(name='Calibri')
         self.from_summary = from_summary
         self.gender_dict = {'gender': 5}
+    
 
+    def __call__(self):
+        df = self.read_file()
+        df = self.process_Metabolic_Syndrome(df)
+        self.save_file_to_excel(df)
+        self.copy_format_from_sheet1()
+        
 
     def resource_path(self, relative_path):
         """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -226,10 +233,6 @@ class Judge_Metabolic_Syndrome:
             ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='W', width=13)
         ws2 = self.change_date_time(worksheet=ws2, number_of_column=7)
         ws2 = self.place_center(worksheet=ws2)
-
-        # label_over_standard worksheet
-        # ws1 = self.label_over_standard(worksheet=ws1)
-        # only process new sheet
         ws2 = self.label_over_standard(worksheet=ws2)
         workbook.save(self.io)
         print("saved")
@@ -317,13 +320,7 @@ class Judge_Metabolic_Syndrome:
         writer = pd.ExcelWriter(self.io, mode='a', engine='openpyxl', if_sheet_exists='replace')
         df.to_excel(writer, sheet_name=self.dst_worksheet, index=False)
         writer.close() 
-
-
-    def main_procesdure(self):
-        df = self.read_file()
-        df = self.process_Metabolic_Syndrome(df)
-        self.save_file_to_excel(df)
-        self.copy_format_from_sheet1()
+        
 
 
 class Metabolic_Syndrome_From_Summary(Judge_Metabolic_Syndrome):
@@ -333,6 +330,13 @@ class Metabolic_Syndrome_From_Summary(Judge_Metabolic_Syndrome):
         self.dst_worksheet = save_sheet_name
         self.years_text = years_text
         self.from_summary = from_summary
+
+
+    def __call__(self):
+        speific_df = self.set_column_name()
+        speific_df = self.process_Metabolic_Syndrome(speific_df)
+        self.save_file_to_excel(speific_df)
+        self.copy_format_from_sheet1()
 
 
     def change_column_name(self, df, specific_column, goal_column_name):
@@ -358,15 +362,7 @@ class Metabolic_Syndrome_From_Summary(Judge_Metabolic_Syndrome):
         speific_df = self.change_column_name(self.df, specific_column, self.goal_column_name)
         return speific_df
     
-    
-    def main_procesdure(self):
-        speific_df = self.set_column_name()
-        speific_df = self.process_Metabolic_Syndrome(speific_df)
-        self.save_file_to_excel(speific_df)
-        self.copy_format_from_sheet1()
-
-        
-        
+         
 
 class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
     def __init__(self, io, src_worksheet, save_sheet_name, years_text):
@@ -596,5 +592,5 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
 
     
 
-a = Judge_Work_Pressure('C:\\Users\\acer\\Desktop\\source.xlsx', '工作表1', 'test2', '112體檢')
-a()
+# a = Judge_Work_Pressure('C:\\Users\\acer\\Desktop\\source.xlsx', '工作表1', 'test2', '112體檢')
+# a()
