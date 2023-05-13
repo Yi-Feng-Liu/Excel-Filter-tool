@@ -4,10 +4,10 @@ from PIL import Image, ImageTk
 import cv2 as cv
 import os, sys
 from tkinter import filedialog, messagebox
-from tkinter.font import Font
+from tkinter import font
 from tkinter import ttk
 import numpy as np
-from util.process import Judge_Metabolic_Syndrome, Metabolic_Syndrome_From_Summary
+from util.process import *
 import webbrowser
 
 
@@ -59,7 +59,7 @@ class Excel_GUI:
         # set windows size
         self.windows_w = 500
         self.windows_h = 500
-        self.font = Font(family="微軟正黑體", size=12)
+        self.font = font.Font(family="微軟正黑體", size=12)
 
         # set windows position
         self.geometry = root.geometry(f"{str(self.windows_w)}x{str(self.windows_h)}+800+300")
@@ -331,7 +331,6 @@ class Excel_GUI:
                 types = self.box.get()
                 if types == self.options[0]:
                     Judge_Metabolic_Syndrome(io=filepath, src_worksheet=sheetName, select_years=select_year, save_sheet_name=save_sheet).main_procesdure()
-
                     self.finishInfo()
                 else:
                     messagebox.showerror(title="錯誤", message="請選擇檔案類型")
@@ -363,6 +362,10 @@ class Excel_GUI:
                 if types == self.options[0]:
                     Metabolic_Syndrome_From_Summary(io=filepath, src_worksheet=sheetName, save_sheet_name=save_sheet, years_text=years_text).main_procesdure()
                     self.finishInfo()
+                elif types == self.options[1]:
+                    run = Judge_Work_Pressure(io=filepath, src_worksheet=sheetName, save_sheet_name=save_sheet, years_text=years_text)
+                    run()
+                    self.finishInfo()
                 else:
                     messagebox.showerror(title="錯誤", message="請選擇檔案類型")
             except Exception as e:
@@ -377,13 +380,3 @@ class Excel_GUI:
     def linked_to_github(self):
         url = 'https://github.com/Yi-Feng-Liu/Excel-Filter-Tool'
         webbrowser.open(url)
-        
-
-    
-        
-    
- 
-# import tkinter as tk
-# root = tk.Tk()
-# Excel_GUI(root)
-# root.mainloop() 

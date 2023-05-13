@@ -95,6 +95,7 @@ class Judge_Metabolic_Syndrome:
         """
         cell.font = self.font
     
+
     def change_font_type_format(self, worksheet):
         """Change font type 
 
@@ -106,6 +107,7 @@ class Judge_Metabolic_Syndrome:
                 # 設置儲存格的字體
                 cell.font = self.font_type
         return worksheet
+
 
     def label_over_standard(self, worksheet):
         """Use to label the cell, if cell's value exceed the standard
@@ -310,7 +312,7 @@ class Judge_Metabolic_Syndrome:
         return df
         
     
-    def save_file_and_copy_title(self, df):
+    def save_file_to_excel(self, df):
         # 建立一個新的 ExcelWriter 物件
         writer = pd.ExcelWriter(self.io, mode='a', engine='openpyxl', if_sheet_exists='replace')
         df.to_excel(writer, sheet_name=self.dst_worksheet, index=False)
@@ -320,7 +322,7 @@ class Judge_Metabolic_Syndrome:
     def main_procesdure(self):
         df = self.read_file()
         df = self.process_Metabolic_Syndrome(df)
-        self.save_file_and_copy_title(df)
+        self.save_file_to_excel(df)
         self.copy_format_from_sheet1()
 
 
@@ -360,7 +362,7 @@ class Metabolic_Syndrome_From_Summary(Judge_Metabolic_Syndrome):
     def main_procesdure(self):
         speific_df = self.set_column_name()
         speific_df = self.process_Metabolic_Syndrome(speific_df)
-        self.save_file_and_copy_title(speific_df)
+        self.save_file_to_excel(speific_df)
         self.copy_format_from_sheet1()
 
         
@@ -376,7 +378,9 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
 
 
     def __call__(self):
-        pass
+        self.insert_work_type_level_and_save()
+        self.change_column_format_and_save()
+        print('OK')
 
 
     def change_column_name(self, df:pd.DataFrame, goal_column_name:str):
@@ -398,10 +402,10 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
 
 
     def read_file_and_change_col_name(self):
-        self.df = pd.read_excel('C:\\Users\\acer\\Desktop\\source.xlsx', sheet_name='工作表1', engine='openpyxl')
+        self.df = pd.read_excel(self.io, sheet_name=self.src_worksheet, engine='openpyxl')
         self.df.drop(labels=['歸屬廠區', '單位', '工作班別'], axis=1, inplace=True)
         # add column & let's order same as template
-        self.df.insert(0, '年度代碼', value='113')
+        self.df.insert(0, '年度代碼', value=self.years_text)
         self.df.insert(9, 'I_Score', value=0)
         self.df.insert(10, 'I_Risk', value=0)
         self.df.insert(18, 'J_Score', value=0)
@@ -414,21 +418,26 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         return self.df
 
 
+    def remove_empty_space(self, x):
+        if isinstance(x, str):
+            x = x.strip()
+            return x
+        elif isinstance(x, list):
+            while "" in x:
+                x.remove("")
+            return x
+
+
     def procrss_name_col(self):
-        self.df['姓名'] = self.df['姓名'].apply(lambda x: x.split(","))
-
-
-    def calculate_level(self, df, *args):
-        sum_series = 0
-        for i in args:
-            sum_series += (5 - df[i])
-        series_value = (25*sum_series)/len(args)
-        return series_value
+        self.df = self.read_file_and_change_col_name()
+        self.df['姓名'] = self.df['姓名'].apply(lambda x: x.split(",")[-1])
+        self.df['姓名'] = self.df['姓名'].apply(lambda x: self.remove_empty_space(x))
+        return self.df
 
 
     def chage_series_text_to_value(self):
         self.get_work_pressure_dict()
-        self.df = self.read_file_and_change_col_name()
+        self.df = self.procrss_name_col()
         # change I columns value
         for i in self.df.iloc[:, 3:9]:
             series_i = self.df[i]
@@ -443,6 +452,14 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         # change 月加班時數等級 value
         self.df.iloc[:, 20] = self.df.iloc[:, 20].apply(lambda x: self.work_time_level.get(x))
  
+
+    def calculate_level(self, df, *args):
+        sum_series = 0
+        for i in args:
+            sum_series += (5 - df[i])
+        series_value = (25*sum_series)/len(args)
+        return series_value
+
 
     def insert_score_value(self):
         self.chage_series_text_to_value()
@@ -488,17 +505,86 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         for i in range(len(x)):
             if x[i] == '無以下特殊形態之工作':
                 x[i] = ""
-        while "" in x:
-            x.remove("")
+        x = self.remove_empty_space(x)
         return len(x)
 
 
-    def insert_work_type_level(self):
+    def insert_work_type_level_and_save(self):
         self.insert_work_loading_level()
         self.df['工作型態評估等級'] = self.df['工作型態評估等級'].apply(lambda x: self.process_work_type_to_level(x))
-        print(self.df['工作型態評估等級'])
-            
+        self.df = self.df.sort_values(by=['工作負荷等級'], ascending=False)
+        self.save_file_to_excel(self.df)
+        print('Save Successfully')
+
+
+    def set_specific_column_format(self, worksheet:str, eng_column:str, width=10, only_change_font_color=False, **kwargs):
+        """set the specific column format.
+
+        **kwargs:
+
+        cell_color: Hexadecimal color, default FFC7CE
+
+        font_name: str --> choose font type, default None
+
+        font_color: Hexadecimal color, default FF0000
+
+        only_change_font_color: bool
+        """
+        only_change_width = kwargs.get('only_change_width', False)
+        cell_color = kwargs.get('cell_color', '00B0F0')
+        font_color = kwargs.get('font_color', 'FFFFFF')
+        font_name = kwargs.get('font_name', '微軟正黑體')
+
+        if only_change_font_color == True:
+            worksheet[f'{eng_column}1'].font = Font(name=font_name, color=font_color, bold=True)
+        else:
+            if only_change_width == True:
+                worksheet.column_dimensions[eng_column].width = width
+            else:
+                worksheet.column_dimensions[eng_column].width = width
+                worksheet[f'{eng_column}1'].fill = PatternFill(
+                    start_color=cell_color, end_color=cell_color, fill_type='solid'
+                )
+                worksheet[f'{eng_column}1'].font = Font(name=font_name, color=font_color, bold=True)
+        return worksheet
+
+
+    def change_column_format_and_save(self):
+        """Copy the original sheet header format to specific sheet
+
+        Including cell's fill, font, color, alignment, dimensions.
+        """
+        workbook = openpyxl.load_workbook(self.io)
+
+        ws2 = workbook[self.dst_worksheet]
+
+        start_column = 68 # D
+        end_column = 88 # X
+        deep_color_cell = [74, 75, 83, 84]
+        yellow_text_cell = [76, 77, 78, 79, 80, 81, 82, 83, 84]
+        change_width_cell = [85, 86, 87]
+        ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='A', width=10, cell_color='FFFF00', font_color='FF0000')
+        ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='B', width=12, cell_color='008000')
+        ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='C', width=10, cell_color='008000')
+        for i in range(start_column, end_column+1):
+            eng_col_name = chr(i)
+            ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name)
+            if i in deep_color_cell:
+                ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name, cell_color='0070C0')
+            if i in yellow_text_cell:
+                ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name, only_change_font_color=True, font_color='FFFF00')
+            if i in change_width_cell:
+                ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name, width=18, only_change_font_color=False, only_change_width=True)
+            if i == 88:
+                ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name, width=20, cell_color='0070C0')
+        
+        ws2 = self.place_center(worksheet=ws2)
+        workbook.save(self.io)
+        print("saved")        
+
+
 
     
 
-Judge_Work_Pressure(1,1,1,1).insert_work_type_level()
+# a = Judge_Work_Pressure('C:\\Users\\acer\\Desktop\\source.xlsx', '工作表1', 'test', '113體檢')
+# a()
