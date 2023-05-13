@@ -518,7 +518,6 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
             return 2
         
 
-
     def insert_work_type_level_and_save(self):
         self.insert_work_loading_level()
         self.df['工作型態評估等級'] = self.df['工作型態評估等級'].apply(lambda x: self.process_work_type_to_level(x))
