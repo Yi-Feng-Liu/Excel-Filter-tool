@@ -7,9 +7,9 @@ This tool is used to filter and analyze Metabolic Syndrome data in an Excel file
 
 ## version 2.0:
 
-1. Add a 'Process Work Pressure' option to the E file processing options.
+1. Added a 'Process Work Pressure' option to the Excel file processing combobox.
 
-2. Add a new function that can be used to process an Excel file on work pressure and quantify the text in each cell.
+2. Added a new function that can process Excel files on work pressure and quantify the text in each cell..
 
 ### *If the sheet name does not exist, it will be automatically created and saved. You can select the type you want to filter from the combobox.*
 
