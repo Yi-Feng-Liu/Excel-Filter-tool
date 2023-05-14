@@ -9,6 +9,7 @@ from tkinter import ttk
 import numpy as np
 from util.process import *
 import webbrowser
+from threading import Thread
 
 
 
@@ -53,6 +54,10 @@ class EntryWithPlaceholder(Entry):
 class Excel_GUI:
     def __init__(self, root):
         self.root = root
+        # self.personal_token = personal_token
+        # self.repo_name = repo_name
+        # self.release_name = release_name
+        # self.download_rar_name = download_rar_name
         # set background color
         self.bgcolor = "#d2efd3"
         self.empty_ls = []
@@ -382,3 +387,28 @@ class Excel_GUI:
     def linked_to_github(self):
         url = 'https://github.com/Yi-Feng-Liu/Excel-Filter-Tool/tags'
         webbrowser.open(url)
+
+
+    # def click_download_lastest_version(self):
+    #     from github import Github
+
+    #     # 設置你的 GitHub 身份驗證信息 #90天後要更新
+    #     g = Github(self.personal_token)
+
+    #     # 指定你的存儲庫名稱和發布版本名稱
+    #     repo_name = self.repo_name
+    #     release_name = self.release_name
+
+    #     # 獲取存儲庫對象
+    #     repo = g.get_repo(repo_name)
+
+    #     # 獲取最新的發布版本對象
+    #     release = repo.get_release(release_name)
+
+    #     # 獲取執行檔的下載鏈接
+    #     download_url = release.get_assets()[0].browser_download_url
+
+    #     # 下載執行檔
+    #     import urllib.request
+    #     urllib.request.urlretrieve(download_url, self.download_rar_name)
+       
