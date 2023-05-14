@@ -7,7 +7,7 @@ def main():
     Thread(target=Excel_GUI, args=(root)).start()
     # Excel_GUI(
     #     root, 
-    #     personal_token='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', 
+    #     personal_token='personal_token', 
     #     repo_name='Yi-Feng-Liu/Excel-Filter-Tool', 
     #     release_name='v2.0.0', 
     #     download_rar_name='Widget.rar'
