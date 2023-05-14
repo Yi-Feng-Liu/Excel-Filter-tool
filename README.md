@@ -11,19 +11,19 @@ This tool is used to filter and analyze Metabolic Syndrome data in an Excel file
 
 2. Add a new function that can be used to process an Excel file on work pressure and quantify the text in each cell.
 
-### *If name of sheet name dose not exist, it will be auto created and save it. The combobox you can select the type which you want to filter.*
+### *If the sheet name does not exist, it will be automatically created and saved. You can select the type you want to filter from the combobox.*
 
 # Method
 
 > 1. Select the type you want to filter.
 
-> 2. Click the choose file button to select file. If you see the submit button, pleat click it.
+> 2. Click the 'Choose File' button to select a file. If you see the 'Submit' button, please click it.
 
-> 3. Please enter the names of sheet you want to process and save, respectively.
+> 3. Please enter the names of the sheets you want to process and save, respectively.
 
-> 4. Press the confirm button. The tool will be start to process file. You only need to wait the 'OK' window appear.
+> 4. Press the confirm button. The tool will start processing the file. You only need to wait for the 'OK' window to appear.
 
-> 5. Check the result is you want, if not please contact me.
+> 5. Check if the result is what you want. If not, please contact me.
 
 # Environment
 
