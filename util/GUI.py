@@ -380,5 +380,5 @@ class Excel_GUI:
     
 
     def linked_to_github(self):
-        url = 'https://github.com/Yi-Feng-Liu/Excel-Filter-Tool'
+        url = 'https://github.com/Yi-Feng-Liu/Excel-Filter-Tool/tags'
         webbrowser.open(url)
