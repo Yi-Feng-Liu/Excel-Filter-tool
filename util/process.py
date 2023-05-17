@@ -15,8 +15,8 @@ class Judge_Metabolic_Syndrome:
         self.dst_worksheet = save_sheet_name
         self.select_years = select_years
         self.years_text = years_text
-        self.fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
-        self.font = Font(name='Calibri', color='FF0000')
+        self.fill = PatternFill(start_color='288EE0', end_color='288EE0', fill_type='solid')
+        self.font = Font(name='Calibri', color='FFFFFF')
         self.font_type = Font(name='Calibri')
         self.from_summary = from_summary
         self.gender_dict = {'gender': 5}
@@ -219,10 +219,10 @@ class Judge_Metabolic_Syndrome:
         ws2 = workbook[self.dst_worksheet]
         # copy format sheet1 header to sheet2 header
         ws2 = self.copy_title_format(ws1=ws1, ws2=ws2)
-        ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='U', width=13, only_change_width=False)
+        ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='U', width=13, only_change_width=True)
         ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='S', width=30, only_change_width=True)
         ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='T', width=25, only_change_width=True)
-        ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='W', width=20, only_change_width=True)
+        ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='W', width=20, only_change_width=False)
         if self.from_summary==True:
             start_column = 71 # G
             end_column = 81 #Q
