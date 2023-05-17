@@ -15,8 +15,8 @@ class Judge_Metabolic_Syndrome:
         self.dst_worksheet = save_sheet_name
         self.select_years = select_years
         self.years_text = years_text
-        self.fill = PatternFill(start_color='288EE0', end_color='288EE0', fill_type='solid')
-        self.font = Font(name='Calibri', color='FFFFFF')
+        self.fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
+        self.font = Font(name='Calibri', color='FF0000')
         self.font_type = Font(name='Calibri')
         self.from_summary = from_summary
         self.gender_dict = {'gender': 5}
