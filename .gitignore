@@ -1,5 +1,4 @@
 /.vscode/*
 /__pycache__/*
 test.py
-util/__pycache__/*
-/*.json
+./util/__pycache__/*
