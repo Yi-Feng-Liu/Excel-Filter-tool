@@ -1,0 +1,41 @@
+{
+    "Metabolic_Syndrome":{    
+        "column_dict":{
+            "waistline":9,
+            "systolic":10,
+            "diastolic":11,
+            "glucose":12,
+            "triglycerides":14,
+            "hdlc":15
+        },
+        "Male_standard":{
+            "waistline": 90,
+            "systolic": 130,
+            "diastolic": 85,
+            "glucose":100,
+            "triglycerides":150,
+            "hdlc": 40
+        }
+    },
+    "Work_Pressure":{
+        "tired_level":{
+            "總是": 1,
+            "常常": 2,
+            "有時候": 3,
+            "不常": 4,
+            "從未或幾乎從未": 5
+        },
+        "sentimental_level":{
+            "很嚴重": 1,
+            "嚴重": 2,
+            "有一些": 3,
+            "輕微": 4,
+            "非常輕微": 5
+        },
+        "work_time_level":{
+            "<45 小時": 0,
+            "45-80 小時": 1,
+            ">80 小時": 2
+        }
+    }   
+}
