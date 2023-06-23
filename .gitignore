@@ -1,6 +1,7 @@
 .vscode/
 __pycache__/
 image/
+Image/
 test.py
 /*qrc
 /*ui
