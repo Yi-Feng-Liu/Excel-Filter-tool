@@ -1,5 +1,6 @@
-# Excel-Filter-Tool  (This tool is made for Lyra)
+# Excel-Filter-Tool  PyQt6 version (This tool is made for Lyra)
 
+In this version, Tkinter version is no longer being updated.
 
 ## version 1.0:
 
@@ -35,7 +36,7 @@ To run this program, your virtual environment will need the following modules.
 
 3. openpyxl
 
-4. tkinter
+4. PyQt6
 
 5. openCV
 
