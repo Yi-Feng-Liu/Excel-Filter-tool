@@ -54,13 +54,9 @@ class EntryWithPlaceholder(Entry):
 class Excel_GUI:
     def __init__(self, root):
         self.root = root
-        # self.personal_token = personal_token
-        # self.repo_name = repo_name
-        # self.release_name = release_name
-        # self.download_rar_name = download_rar_name
-        # set background color
         self.bgcolor = "#d2efd3"
         self.empty_ls = []
+
         # set windows size
         self.windows_w = 500
         self.windows_h = 500
@@ -89,6 +85,7 @@ class Excel_GUI:
         self.iconimg = self.getIcon('Images\\icon.jpg')
         root.iconphoto(True, self.iconimg)
         root.configure(bg=self.bgcolor)
+
         # set app title
         self.title = root.title("Excel Filter Tool")
         
@@ -126,9 +123,26 @@ class Excel_GUI:
         self.v = IntVar()
         self.v.set(0)
     
-        self.e_file = Radiobutton(self.root, text=methods[0][0], variable=self.v, value=methods[0][1], command=methods[0][2],bg=self.bgcolor, font=self.font)
+        self.e_file = Radiobutton(
+            self.root, 
+            text=methods[0][0], 
+            variable=self.v, 
+            value=methods[0][1], 
+            command=methods[0][2],
+            bg=self.bgcolor, 
+            font=self.font
+        )
         self.e_file.place(x=160, y=30, anchor='center')
-        self.paper_file = Radiobutton(self.root, text=methods[1][0], variable=self.v, value=methods[1][1], command=methods[1][2], bg=self.bgcolor, font=self.font)
+
+        self.paper_file = Radiobutton(
+            self.root, 
+            text=methods[1][0], 
+            variable=self.v, 
+            value=methods[1][1], 
+            command=methods[1][2], 
+            bg=self.bgcolor, 
+            font=self.font
+        )
         self.paper_file.place(x=500-160, y=30, anchor='center')
 
 
@@ -179,13 +193,21 @@ class Excel_GUI:
         self.years_entry_label = Label(self.root, text='年度代碼:', font=self.font, bg=self.bgcolor)
         self.years_entry_label.place(x=self.combobox_xlabel_place, y=self.windows_h-220)
         self.defalut_years_placeholder_message = '輸入年度代碼名稱 (Ex: 111年度健檢)'
-        self.years_text_entry = EntryWithPlaceholder(master=self.root, placeholder=self.defalut_years_placeholder_message, width=30)
+        self.years_text_entry = EntryWithPlaceholder(
+            master = self.root, 
+            placeholder = self.defalut_years_placeholder_message, 
+            width = 30
+        )
         self.years_text_entry.place(x=self.combobox_place, y=self.windows_h-217)
 
         self.save_sheet_name_label = Label(self.root, text='工作表名稱:', font=self.font, bg=self.bgcolor)
         self.save_sheet_name_label.place(x=self.combobox_xlabel_place, y=self.windows_h-190)
         self.defalut_placeholder_message = '輸入要儲存的Sheet名稱'
-        self.save_sheet_name_entry = EntryWithPlaceholder(master=self.root, placeholder=self.defalut_placeholder_message, width=30)
+        self.save_sheet_name_entry = EntryWithPlaceholder(
+            master = self.root, 
+            placeholder = self.defalut_placeholder_message, 
+            width = 30
+        )
         self.save_sheet_name_entry.place(x=self.combobox_place, y=self.windows_h-187)
 
         self.savelabel= Label(self.root, text='', font=self.font, bg=self.bgcolor)
@@ -234,7 +256,11 @@ class Excel_GUI:
         self.save_sheet_name_label = Label(self.root, text='Sheet Name:', font=self.font, bg=self.bgcolor)
         self.save_sheet_name_label.place(x=self.combobox_xlabel_place, y=self.windows_h-190)
         self.defalut_placeholder_message = '輸入要儲存的Sheet名稱'
-        self.save_sheet_name_entry = EntryWithPlaceholder(master=self.root, placeholder=self.defalut_placeholder_message, width=30)
+        self.save_sheet_name_entry = EntryWithPlaceholder(
+            master = self.root, 
+            placeholder = self.defalut_placeholder_message, 
+            width = 30
+        )
         self.save_sheet_name_entry.place(x=self.combobox_place, y=self.windows_h-187)
 
         # set sheet comfirm button
