@@ -135,7 +135,7 @@ class Judge_Metabolic_Syndrome:
                 for key, value in column_dict.items():
                     if row[value].value is None:
                         continue
-                    
+
                     if row[value].value == '無資料':
                         continue
 
@@ -645,8 +645,91 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         workbook.save(self.io)      
 
 
+from docx import Document
+from openpyxl import load_workbook
+import warnings
+warnings.simplefilter(action='ignore', category=UserWarning)
 
+class excel_to_word_table:
+    def __init__(self, word_source, excel_source, word_target) -> None:
+        self.word_source = word_source
+        self.excel_source = excel_source
+        self.word_target = word_target
+
+    def get_excel_dict(self, excel_source) -> dict:
+        # open Excel
+        workbook = load_workbook(excel_source)
+        sheet = workbook.active
+
+        # get excel cell key & value
+        excel_dict = {}
+        for row in sheet.iter_rows(min_row=1, values_only=True):
+            for i, _ in enumerate(row, 1):
+                if i < 8:
+                    if row[i] == None or row[i-1] == None:
+                        continue
+                    else:
+                        excel_dict[row[i-1].strip()] = str(row[i]).strip()
+        return excel_dict
     
 
-# a = Judge_Work_Pressure('C:\\Users\\acer\\Desktop\\source.xlsx', '工作表1', 'test2', '112體檢')
-# a()
+    def process_word(self, word_source:str, excel_dict:dict, save_name:str) -> None:
+        # open Word
+        doc = Document(word_source)
+        table = doc.tables[0]
+        for i, word_row in enumerate(table.rows):
+            for j, _ in enumerate(word_row.cells):
+                # part of basic info
+                if (i >= 1 and i < 4) and (j == 1 or j == 7):
+                    table.cell(i, j+2).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+
+                # part of health summary
+                elif i >= 6 and i <= 11:
+                    if (j==0 or j==2) or (i<11 and j==7) or (i==11 and (j==6 or j==10)): 
+                        if (i==10 or i==11) and (j==2 or j==3):
+                            continue
+                        table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                        
+                # cell of context from 其他症狀
+                elif i == 22 and j == 4:
+                    table.cell(i, j).text = excel_dict.get(str(table.cell(i-1, j).text).strip(), '')
+                
+                # row from 抽菸習慣~三高族群分級
+                elif i >= 12 and i <= 20:
+                    if j == 1:
+                        table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                        
+                    # empty cell from 頸 ~ 左肩 and 左手 ~ 右腳踝
+                    elif (i < 18 and j == 6) or (i < 19 and j == 10): 
+                        table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+
+                    # empty cell
+                    elif i == 18 and (j > 5 and j < 10):
+                        table.cell(i, j).text = ''
+                    
+                # row from I_score ~ I_risk   
+                elif (i >= 21 and i < 23) and (j == 0 or j == 2): 
+                    table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+
+                # row from 加班時數~異常工作負荷
+                elif i >= 23 and j == 1:
+                    table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                
+                else:
+                    pass
+
+        doc.save(save_name)
+
+
+    def run_convert(self):
+        excel_dict = self.get_excel_dict(excel_source=excel_source)
+        self.process_word(word_source=word_source, excel_dict=excel_dict, save_name=word_target)
+
+
+if __name__ == '__main__':
+    word_source = 'tv2.docx'
+    excel_source = 'sv2.xlsx'
+    word_target = 'output2.docx'
+    etwt = excel_to_word_table(word_source=word_source, excel_source=excel_source, word_target=word_target)
+    excel_dict = etwt.get_excel_dict(excel_source=excel_source)
+    etwt.process_word(word_source=word_source, excel_dict=excel_dict, save_name=word_target)
