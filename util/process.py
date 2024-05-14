@@ -36,6 +36,7 @@ class Judge_Metabolic_Syndrome:
             base_path = sys._MEIPASS
         except Exception:
             base_path = os.path.abspath(".")
+
         return os.path.join(base_path, relative_path)
 
 
@@ -650,15 +651,38 @@ from openpyxl import load_workbook
 import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
 
+
 class excel_to_word_table:
-    def __init__(self, word_source, excel_source, word_target) -> None:
-        self.word_source = word_source
+    def __init__(self, excel_source='') -> None:
+        self.excel_source = excel_source if excel_source != '' else './util/sample.xlsx'
+        self.word_source = './util/template_word.docx'
+        self.folder = './documents/'
+
+        filename = self.excel_source.split('.')[0].split('/')[-1] + '.docx'
+        self.word_target = self.folder + filename
+
+    
+    def __call__(self, excel_source):
         self.excel_source = excel_source
-        self.word_target = word_target
+
+        filename = self.excel_source.split('.')[0].split('/')[-1] + '.docx'
+        self.word_target = self.folder + filename
+
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+            
+        return os.path.join(base_path, relative_path)
+    
 
     def get_excel_dict(self, excel_source) -> dict:
         # open Excel
-        workbook = load_workbook(excel_source)
+        workbook = load_workbook(self.resource_path(excel_source))
         sheet = workbook.active
 
         # get excel cell key & value
@@ -673,9 +697,9 @@ class excel_to_word_table:
         return excel_dict
     
 
-    def process_word(self, word_source:str, excel_dict:dict, save_name:str) -> None:
+    def process_word(self, excel_dict:dict, save_name:str) -> None:
         # open Word
-        doc = Document(word_source)
+        doc = Document(self.word_source)
         table = doc.tables[0]
         for i, word_row in enumerate(table.rows):
             for j, _ in enumerate(word_row.cells):
@@ -685,7 +709,7 @@ class excel_to_word_table:
 
                 # part of health summary
                 elif i >= 6 and i <= 11:
-                    if (j==0 or j==2) or (i<11 and j==7) or (i==11 and (j==6 or j==10)): 
+                    if (j==0 or j==2) or (i<11 and j==9) or (i==11 and (j==6 or j==9)): 
                         if (i==10 or i==11) and (j==2 or j==3):
                             continue
                         table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
@@ -697,10 +721,15 @@ class excel_to_word_table:
                 # row from 抽菸習慣~三高族群分級
                 elif i >= 12 and i <= 20:
                     if j == 1:
-                        table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                        value = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                        if '，' in value:
+                            splitvalue = value.split('，')[0]
+                            table.cell(i, j+1).text = splitvalue
+                        else:
+                            table.cell(i, j+1).text = value
                         
                     # empty cell from 頸 ~ 左肩 and 左手 ~ 右腳踝
-                    elif (i < 18 and j == 6) or (i < 19 and j == 10): 
+                    elif (i < 18 and j == 6) or (i < 19 and j == 9): 
                         table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
 
                     # empty cell
@@ -722,14 +751,11 @@ class excel_to_word_table:
 
 
     def run_convert(self):
-        excel_dict = self.get_excel_dict(excel_source=excel_source)
-        self.process_word(word_source=word_source, excel_dict=excel_dict, save_name=word_target)
+        excel_dict = self.get_excel_dict(excel_source=self.excel_source)
+        self.process_word(excel_dict=excel_dict, save_name=self.word_target)
+
 
 
 if __name__ == '__main__':
-    word_source = 'tv2.docx'
-    excel_source = 'sv2.xlsx'
-    word_target = 'output2.docx'
-    etwt = excel_to_word_table(word_source=word_source, excel_source=excel_source, word_target=word_target)
-    excel_dict = etwt.get_excel_dict(excel_source=excel_source)
-    etwt.process_word(word_source=word_source, excel_dict=excel_dict, save_name=word_target)
+    etwt = excel_to_word_table()
+    etwt.run_convert()

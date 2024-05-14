@@ -4,3 +4,7 @@ test.py
 util/__pycache__/
 util/*.docx
 util/*.xlsx
+documents/
+build/
+dist/
+Excel Filter Tool.spec
