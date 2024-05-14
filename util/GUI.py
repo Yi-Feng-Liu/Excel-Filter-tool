@@ -318,7 +318,10 @@ class Excel_GUI:
         self.saveFile_button.place(x=390, y=249)
         self.show_save_dir_entry = Entry(master=self.root, width=40)
         self.show_save_dir_entry.place(x=100, y=250)
-        self.create_confirm_botton(command=self.run_excel_to_word)
+        try:
+            self.create_confirm_botton(command=self.run_excel_to_word)
+        except Exception as e:
+            messagebox.showerror(title="錯誤", message=e)
         
 
     def resize(self, imgpath:str, resize_w:int, resize_h:int, changeBG=True):
@@ -331,7 +334,7 @@ class Excel_GUI:
                 mask = np.logical_and.reduce(origin_img == 255, axis=2)
                 origin_img[mask] = [211, 239, 211]
         resize_img = cv.resize(origin_img, (resize_w, resize_h))
-        save_path = resource_path(f'Images/{image_name}_resize.jpg')
+        save_path = resource_path(f'Images\\{image_name}_resize.jpg')
         cv.imwrite(save_path, resize_img)
         return save_path
 
@@ -506,13 +509,15 @@ class Excel_GUI:
     def package_into_zip(self, save_zip_path):
         import zipfile
         from glob import glob
-
-        files = glob('./documents/*.docx')
-        folder_path = './documents/*.docx'
+        folder_path = 'documents\\'
+        files = glob(resource_path(folder_path) + '*.docx')
+        
         with zipfile.ZipFile(save_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for file in files:
-                arc_name = os.path.relpath(file, os.path.dirname(folder_path))
+                arc_name = os.path.basename(file)
+                messagebox.showinfo(title="完成通知", message=arc_name)
                 zipf.write(file, arcname=arc_name)
+                os.remove(file)
 
 
     def open_muti_excelFile(self):
@@ -545,10 +550,16 @@ class Excel_GUI:
 
     def run_excel_to_word(self):
         for file in self.filepath:
-            etwt = excel_to_word_table(excel_source=file)
-            etwt.run_convert()
-        self.package_into_zip(save_zip_path=resource_path(self.show_save_dir_entry.get()))
-        self.finishInfo()
+            try:
+                etwt = excel_to_word_table(excel_source=file)
+                etwt.run_convert()
+            except Exception as e:
+                messagebox.showerror(title="錯誤1", message=e)
+        try:
+            self.package_into_zip(save_zip_path=(self.show_save_dir_entry.get()))
+            self.finishInfo()
+        except Exception as e:
+            messagebox.showerror(title="錯誤2", message=e)
 
     # def click_download_lastest_version(self):
     #     from github import Github

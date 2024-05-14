@@ -41,7 +41,7 @@ class Judge_Metabolic_Syndrome:
 
 
     def get_json_data(self):
-        with open(self.resource_path("util/types.json"), encoding="utf-8") as f:
+        with open(self.resource_path("util\\types.json"), encoding="utf-8") as f:
             data = json.load(f)
         return data
 
@@ -654,19 +654,12 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 
 class excel_to_word_table:
     def __init__(self, excel_source='') -> None:
-        self.excel_source = excel_source if excel_source != '' else './util/sample.xlsx'
-        self.word_source = './util/template_word.docx'
-        self.folder = './documents/'
+        self.excel_source = excel_source if excel_source != '' else self.resource_path('util\\sample.xlsx')
+        self.word_source = 'util\\template_word.docx'
+        self.folder = 'documents\\'
 
-        filename = self.excel_source.split('.')[0].split('/')[-1] + '.docx'
-        self.word_target = self.folder + filename
-
-    
-    def __call__(self, excel_source):
-        self.excel_source = excel_source
-
-        filename = self.excel_source.split('.')[0].split('/')[-1] + '.docx'
-        self.word_target = self.folder + filename
+        self.filename = self.excel_source.split('.')[0].split('/')[-1] + '.docx'
+        self.word_target = self.resource_path(self.folder) + self.filename
 
 
     def resource_path(self, relative_path):
@@ -682,7 +675,7 @@ class excel_to_word_table:
 
     def get_excel_dict(self, excel_source) -> dict:
         # open Excel
-        workbook = load_workbook(self.resource_path(excel_source))
+        workbook = load_workbook(excel_source)
         sheet = workbook.active
 
         # get excel cell key & value
@@ -699,7 +692,7 @@ class excel_to_word_table:
 
     def process_word(self, excel_dict:dict, save_name:str) -> None:
         # open Word
-        doc = Document(self.word_source)
+        doc = Document(self.resource_path(self.word_source))
         table = doc.tables[0]
         for i, word_row in enumerate(table.rows):
             for j, _ in enumerate(word_row.cells):
@@ -756,6 +749,6 @@ class excel_to_word_table:
 
 
 
-if __name__ == '__main__':
-    etwt = excel_to_word_table()
-    etwt.run_convert()
+# if __name__ == '__main__':
+#     etwt = excel_to_word_table()
+#     etwt.run_convert()
