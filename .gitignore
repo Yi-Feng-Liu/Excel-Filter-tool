@@ -2,13 +2,9 @@
 __pycache__/
 test.py
 util/__pycache__/
-<<<<<<< HEAD
-/PyQt tutorial
-=======
 util/*.docx
 util/*.xlsx
 documents/
 build/
 dist/
 Excel Filter Tool.spec
->>>>>>> TK-version
