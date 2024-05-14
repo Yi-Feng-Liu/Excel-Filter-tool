@@ -36,11 +36,12 @@ class Judge_Metabolic_Syndrome:
             base_path = sys._MEIPASS
         except Exception:
             base_path = os.path.abspath(".")
+
         return os.path.join(base_path, relative_path)
 
 
     def get_json_data(self):
-        with open(self.resource_path("util/types.json"), encoding="utf-8") as f:
+        with open(self.resource_path("util\\types.json"), encoding="utf-8") as f:
             data = json.load(f)
         return data
 
@@ -135,8 +136,10 @@ class Judge_Metabolic_Syndrome:
                 for key, value in column_dict.items():
                     if row[value].value is None:
                         continue
+
                     if row[value].value == '無資料':
                         continue
+
                     if isinstance(row[value].value, str):
                         row[value].value = float(row[value].value)
                         if key == 'hdlc' and row[value].value < standard_dict[key]:
@@ -147,6 +150,7 @@ class Judge_Metabolic_Syndrome:
                             self.change_font_color_format(row[value])
                         if over_standard_cnt >= 3:
                             self.change_font_color_format(people_name)
+
                     else:
                         if key == 'waistline' and row[value].value >= standard_dict[key]:
                             over_standard_cnt += 1
@@ -164,8 +168,10 @@ class Judge_Metabolic_Syndrome:
                 for key, value in column_dict.items():
                     if row[value].value is None:
                         continue
+
                     if row[value].value == '無資料':
                         continue
+
                     if isinstance(row[value].value, str):
                         row[value].value = float(row[value].value.split('(')[0])
                         if key == 'waistline' and row[value].value >= standard_dict[key]-10:
@@ -179,6 +185,7 @@ class Judge_Metabolic_Syndrome:
                             self.change_font_color_format(row[value])
                         if over_standard_cnt >= 3:
                             self.change_font_color_format(people_name)
+
                     else:
                         if key == 'waistline' and row[value].value >= standard_dict[key]-10:
                             over_standard_cnt += 1
@@ -234,6 +241,7 @@ class Judge_Metabolic_Syndrome:
             ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='T', width=24, only_change_width=True)
             ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='V', width=13)
             ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='W', width=13)
+            
         ws2 = self.change_date_time(worksheet=ws2, number_of_column=7)
         ws2 = self.place_center(worksheet=ws2)
         ws2 = self.label_over_standard(worksheet=ws2)
@@ -265,7 +273,6 @@ class Judge_Metabolic_Syndrome:
             df = df[df['年度代碼'].str.startswith(self.years_text)]
              
         for i in range(len(df.index)):
-            # name = df.iloc[i, 1] 
             gender = df.iloc[i, self.gender_dict['gender']] 
             over_standard_cnt = 0
             if gender == '男':
@@ -273,9 +280,11 @@ class Judge_Metabolic_Syndrome:
                     df_value = df.iloc[i, value]
                     if pd.isna(df_value):
                         continue
+                    
                     if df_value=='無資料':
                         df_value = ''
                         continue
+
                     if isinstance(df_value, str):
                         df_value = float(df_value)
                         if key == 'hdlc' and df_value < standard_dict[key]:
@@ -283,20 +292,24 @@ class Judge_Metabolic_Syndrome:
                         elif key != 'hdlc' and df_value >= standard_dict[key]:
                             over_standard_cnt += 1
                         df.iloc[i, len(df.columns)-1] = over_standard_cnt
+
                     else:
                         if key == 'hdlc' and df_value < standard_dict[key]:
                             over_standard_cnt += 1
                         elif key != 'hdlc' and df_value >= standard_dict[key]:
                             over_standard_cnt += 1
                         df.iloc[i, len(df.columns)-1] = over_standard_cnt
+
             elif gender == '女':
                 for key, value in column_dict.items():
                     df_value = df.iloc[i, value]
                     if pd.isna(df_value):
                         continue
+
                     if df_value=='無資料':
                         df_value = ''
                         continue
+
                     if isinstance(df_value, str):
                         df_value = float(df_value.split('(')[0])
                         if key == 'waistline' and df_value >= standard_dict[key]-10:
@@ -305,7 +318,9 @@ class Judge_Metabolic_Syndrome:
                             over_standard_cnt += 1
                         elif key != 'hdlc' and df_value >= standard_dict[key]:
                             over_standard_cnt += 1 
+
                         df.iloc[i, len(df.columns)-1] = over_standard_cnt
+
                     else:
                         if key == 'waistline' and df_value >= standard_dict[key]-10:
                             over_standard_cnt += 1
@@ -313,8 +328,11 @@ class Judge_Metabolic_Syndrome:
                             over_standard_cnt += 1
                         elif key != 'hdlc' and df_value >= standard_dict[key]:
                             over_standard_cnt += 1 
+
                         df.iloc[i, len(df.columns)-1] = over_standard_cnt
+
         df = df.sort_values(by=['超過標準數'], ascending=False)
+
         return df
         
     
@@ -358,9 +376,13 @@ class Metabolic_Syndrome_From_Summary(Judge_Metabolic_Syndrome):
         self.df['健檢過程備註說明'] = ''
         self.df = self.df.drop(labels=0, axis=0)
 
-        specific_column = ['年度代碼', '姓名', '工／學號', '部門代號', '部門／科系', '性別', '生日', '身高', '體重', '腰圍', '收縮壓', '舒張壓', 'AC飯前血糖', 'T-CHO總膽固醇', 'TG三酸甘油脂', 'HDL高密度脂蛋白', 'LDL低密度脂蛋白', '吸菸習慣', '既往病史', '健檢過程備註說明', 'SGOT血清麩酸草酸轉氨脢', 'SGPT血清麩酸丙銅轉氨脢']
+        specific_column = [
+            '年度代碼', '姓名', '工／學號', '部門代號', '部門／科系', '性別', '生日', '身高', '體重', '腰圍', '收縮壓', '舒張壓', 'AC飯前血糖', 'T-CHO總膽固醇', 'TG三酸甘油脂', 'HDL高密度脂蛋白', 'LDL低密度脂蛋白', '吸菸習慣', '既往病史', '健檢過程備註說明', 'SGOT血清麩酸草酸轉氨脢', 'SGPT血清麩酸丙銅轉氨脢'
+        ]
 
-        self.goal_column_name = ['年度代碼', '姓名', '員工編號', '部門代號', '部門名稱', '性別', '出生年月日', '身高_cm', '體重_kg', '腰圍_cm', '收縮壓', '舒張壓', '飯前血醣', '總膽固醇', '三酸甘油脂', '高密度膽固醇', '低密度膽固醇', '抽菸習慣', '既往病歷', '健檢過程備註說明', 'SGOT', 'SGOT']
+        self.goal_column_name = [
+            '年度代碼', '姓名', '員工編號', '部門代號', '部門名稱', '性別', '出生年月日', '身高_cm', '體重_kg', '腰圍_cm', '收縮壓', '舒張壓', '飯前血醣', '總膽固醇', '三酸甘油脂', '高密度膽固醇', '低密度膽固醇', '抽菸習慣', '既往病歷', '健檢過程備註說明', 'SGOT', 'SGOT'
+        ]
 
         speific_df = self.change_column_name(self.df, specific_column, self.goal_column_name)
         return speific_df
@@ -383,7 +405,8 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
 
 
     def change_column_name(self, df:pd.DataFrame, goal_column_name:str):
-        """The original column order should be same as goal column, this function only change the name of original column to goal.
+        """
+        The original column order should be same as goal column, this function only change the name of original column to goal.
         """
         speific_df = df.copy()
         speific_df_columns = speific_df.columns.to_list()
@@ -403,6 +426,7 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
     def read_file_and_change_col_name(self):
         self.df = pd.read_excel(self.io, sheet_name=self.src_worksheet, engine='openpyxl')
         self.df.drop(labels=['歸屬廠區', '單位', '工作班別'], axis=1, inplace=True)
+
         # add column & let's order same as template
         self.df.insert(0, '年度代碼', value=self.years_text)
         self.df.insert(9, 'I_Score', value=0)
@@ -412,8 +436,11 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         self.df.insert(22, '工作型態內容說明', value='無')
         self.df.insert(23, '工作負荷等級', value=0)
 
-        target_col = ['年度代碼', '姓名', '員工編號', 'I01', 'I02', 'I03', 'I04', 'I05', 'I06', 'I_Score', 'I_Risk', 'J01', 'J02', 'J03', 'J04','J05', 'J06', 'J07', 'J_Score', 'J_Risk', '月加班時數等級', '工作型態評估等級', '工作型態內容說明', '工作負荷等級']
+        target_col = [
+            '年度代碼', '姓名', '員工編號', 'I01', 'I02', 'I03', 'I04', 'I05', 'I06', 'I_Score', 'I_Risk', 'J01', 'J02', 'J03', 'J04','J05', 'J06', 'J07', 'J_Score', 'J_Risk', '月加班時數等級', '工作型態評估等級', '工作型態內容說明', '工作負荷等級'
+        ]
         self.df = self.change_column_name(self.df, target_col)
+
         return self.df
 
 
@@ -421,6 +448,7 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         if isinstance(x, str):
             x = x.strip()
             return x
+        
         elif isinstance(x, list):
             while "" in x:
                 x.remove("")
@@ -441,13 +469,16 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         for i in self.df.iloc[:, 3:9]:
             series_i = self.df[i]
             self.df[i] = series_i.apply(lambda x: self.tired_level.get(x))
+
         # change J columns value
         for j in self.df.iloc[:, 11:14]:
             series_j = self.df[j]
             self.df[j] = series_j.apply(lambda x: self.sentimental_level.get(x))
+
         for j in self.df.iloc[:, 14:18]:
             series_j = self.df[j]
             self.df[j] = series_j.apply(lambda x: self.tired_level.get(x))
+
         # change 月加班時數等級 value
         self.df.iloc[:, 20] = self.df.iloc[:, 20].apply(lambda x: self.work_time_level.get(x))
  
@@ -457,6 +488,7 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         for i in args:
             sum_series += (5 - df[i])
         series_value = (25*sum_series)/len(args)
+
         return series_value
 
 
@@ -474,16 +506,20 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         for i in range(len(self.df['I_Score'])):
             if self.df['I_Score'][i] <= 50:
                 self.df.loc[i, 'I_Risk'] = 0
+
             elif self.df['I_Score'][i] >= 70:
                 self.df.loc[i, 'I_Risk'] = 2
+
             else:
                 self.df.loc[i, 'I_Risk'] = 1
 
         for j in range(len(self.df['J_Score'])):
             if self.df['J_Score'][j] <= 45:
                 self.df.loc[j, 'J_Risk'] = 0
+
             elif self.df['J_Score'][j] >= 60:
                 self.df.loc[j, 'J_Risk'] = 2
+
             else:
                 self.df.loc[j, 'J_Risk'] = 1
 
@@ -505,14 +541,17 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
             if x[i] == '無以下特殊形態之工作':
                 x[i] = ""
         x = self.remove_empty_space(x)
+
         return len(x)
 
 
     def judge_work_type_level(self, x):
         if x >= 0 and x <= 1:
             return 0
+        
         elif x >= 2 and x <= 3:
             return 1
+        
         elif x >= 4:
             return 2
         
@@ -521,7 +560,6 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         self.insert_work_loading_level()
         self.df['工作型態評估等級'] = self.df['工作型態評估等級'].apply(lambda x: self.process_work_type_to_level(x))
         self.df['工作型態評估等級'] = self.df['工作型態評估等級'].apply(lambda x: self.judge_work_type_level(x))
-        # print(max(self.df['工作型態評估等級']))
         self.save_file_to_excel(self.df)
     
 
@@ -545,15 +583,20 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
 
         if only_change_font_color == True:
             worksheet[f'{eng_column}1'].font = Font(name=font_name, color=font_color, bold=True)
+            
         else:
             if only_change_width == True:
                 worksheet.column_dimensions[eng_column].width = width
+
             else:
                 worksheet.column_dimensions[eng_column].width = width
                 worksheet[f'{eng_column}1'].fill = PatternFill(
-                    start_color=cell_color, end_color=cell_color, fill_type='solid'
+                    start_color = cell_color, 
+                    end_color = cell_color, 
+                    fill_type = 'solid'
                 )
                 worksheet[f'{eng_column}1'].font = Font(name=font_name, color=font_color, bold=True)
+
         return worksheet
 
 
@@ -571,27 +614,141 @@ class Judge_Work_Pressure(Metabolic_Syndrome_From_Summary):
         deep_color_cell = [74, 75, 83, 84]
         yellow_text_cell = [76, 77, 78, 79, 80, 81, 82, 83, 84]
         change_width_cell = [85, 86, 87]
+
         ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='A', width=10, cell_color='FFFF00', font_color='FF0000')
         ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='B', width=12, cell_color='008000')
         ws2 = self.set_specific_column_format(worksheet=ws2, eng_column='C', width=10, cell_color='008000')
+
         for i in range(start_column, end_column+1):
             eng_col_name = chr(i)
             ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name)
             if i in deep_color_cell:
-                ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name, cell_color='0070C0')
+                ws2 = self.set_specific_column_format(
+                    worksheet=ws2, eng_column=eng_col_name, cell_color='0070C0'
+                )
+
             if i in yellow_text_cell:
-                ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name, only_change_font_color=True, font_color='FFFF00')
+                ws2 = self.set_specific_column_format(
+                    worksheet=ws2, eng_column=eng_col_name, only_change_font_color=True, font_color='FFFF00'
+                )
+                
             if i in change_width_cell:
-                ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name, width=18, only_change_font_color=False, only_change_width=True)
+                ws2 = self.set_specific_column_format(
+                    worksheet=ws2, eng_column=eng_col_name, width=18, only_change_font_color=False, only_change_width=True
+                )
+
             if i == 88:
-                ws2 = self.set_specific_column_format(worksheet=ws2, eng_column=eng_col_name, width=20, cell_color='0070C0')
+                ws2 = self.set_specific_column_format(
+                    worksheet=ws2, eng_column=eng_col_name, width=20, cell_color='0070C0'
+                )
         
         ws2 = self.place_center(worksheet=ws2)
         workbook.save(self.io)      
 
 
+from docx import Document
+from openpyxl import load_workbook
+import warnings
+warnings.simplefilter(action='ignore', category=UserWarning)
 
+
+class excel_to_word_table:
+    def __init__(self, excel_source='') -> None:
+        self.excel_source = excel_source if excel_source != '' else self.resource_path('util\\sample.xlsx')
+        self.word_source = 'util\\template_word.docx'
+        self.folder = 'documents\\'
+
+        self.filename = self.excel_source.split('.')[0].split('/')[-1] + '.docx'
+        self.word_target = self.resource_path(self.folder) + self.filename
+
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+            
+        return os.path.join(base_path, relative_path)
     
 
-# a = Judge_Work_Pressure('C:\\Users\\acer\\Desktop\\source.xlsx', '工作表1', 'test2', '112體檢')
-# a()
+    def get_excel_dict(self, excel_source) -> dict:
+        # open Excel
+        workbook = load_workbook(excel_source)
+        sheet = workbook.active
+
+        # get excel cell key & value
+        excel_dict = {}
+        for row in sheet.iter_rows(min_row=1, values_only=True):
+            for i, _ in enumerate(row, 1):
+                if i < 8:
+                    if row[i] == None or row[i-1] == None:
+                        continue
+                    else:
+                        excel_dict[row[i-1].strip()] = str(row[i]).strip()
+        return excel_dict
+    
+
+    def process_word(self, excel_dict:dict, save_name:str) -> None:
+        # open Word
+        doc = Document(self.resource_path(self.word_source))
+        table = doc.tables[0]
+        for i, word_row in enumerate(table.rows):
+            for j, _ in enumerate(word_row.cells):
+                # part of basic info
+                if (i >= 1 and i < 4) and (j == 1 or j == 7):
+                    table.cell(i, j+2).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+
+                # part of health summary
+                elif i >= 6 and i <= 11:
+                    if (j==0 or j==2) or (i<11 and j==9) or (i==11 and (j==6 or j==9)): 
+                        if (i==10 or i==11) and (j==2 or j==3):
+                            continue
+                        table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                        
+                # cell of context from 其他症狀
+                elif i == 22 and j == 4:
+                    table.cell(i, j).text = excel_dict.get(str(table.cell(i-1, j).text).strip(), '')
+                
+                # row from 抽菸習慣~三高族群分級
+                elif i >= 12 and i <= 20:
+                    if j == 1:
+                        value = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                        if '，' in value:
+                            splitvalue = value.split('，')[0]
+                            table.cell(i, j+1).text = splitvalue
+                        else:
+                            table.cell(i, j+1).text = value
+                        
+                    # empty cell from 頸 ~ 左肩 and 左手 ~ 右腳踝
+                    elif (i < 18 and j == 6) or (i < 19 and j == 9): 
+                        table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+
+                    # empty cell
+                    elif i == 18 and (j > 5 and j < 10):
+                        table.cell(i, j).text = ''
+                    
+                # row from I_score ~ I_risk   
+                elif (i >= 21 and i < 23) and (j == 0 or j == 2): 
+                    table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+
+                # row from 加班時數~異常工作負荷
+                elif i >= 23 and j == 1:
+                    table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                
+                else:
+                    pass
+
+        doc.save(save_name)
+
+
+    def run_convert(self):
+        excel_dict = self.get_excel_dict(excel_source=self.excel_source)
+        self.process_word(excel_dict=excel_dict, save_name=self.word_target)
+
+
+
+# if __name__ == '__main__':
+#     etwt = excel_to_word_table()
+#     etwt.run_convert()
