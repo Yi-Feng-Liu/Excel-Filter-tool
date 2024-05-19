@@ -650,7 +650,8 @@ from docx import Document
 from openpyxl import load_workbook
 import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
-
+from docx.oxml.ns import qn  
+from docx.shared import Pt 
 
 class excel_to_word_table:
     def __init__(self, excel_source='') -> None:
@@ -691,6 +692,13 @@ class excel_to_word_table:
     
 
     def process_word(self, excel_dict:dict, save_name:str) -> None:
+        def change_font_type(index_x, index_y):
+            run = table.cell(index_x, index_y).paragraphs[0].runs[0]
+            run.font.name = 'Microsoft JhengHei'
+            run.bold = True
+            run._element.rPr.rFonts.set(qn('w:eastAsia'), 'Microsoft JhengHei')
+            run.font.size = Pt(10)
+
         # open Word
         doc = Document(self.resource_path(self.word_source))
         table = doc.tables[0]
@@ -699,6 +707,7 @@ class excel_to_word_table:
                 # part of basic info
                 if (i >= 1 and i < 4) and (j == 1 or j == 7):
                     table.cell(i, j+2).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                    change_font_type(i, j+2)
 
                 # part of health summary
                 elif i >= 6 and i <= 11:
@@ -706,11 +715,13 @@ class excel_to_word_table:
                         if (i==10 or i==11) and (j==2 or j==3):
                             continue
                         table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
-                        
+                        change_font_type(i, j+1)
+
                 # cell of context from 其他症狀
                 elif i == 22 and j == 4:
                     table.cell(i, j).text = excel_dict.get(str(table.cell(i-1, j).text).strip(), '')
-                
+                    change_font_type(i, j)
+
                 # row from 抽菸習慣~三高族群分級
                 elif i >= 12 and i <= 20:
                     if j == 1:
@@ -718,25 +729,34 @@ class excel_to_word_table:
                         if '，' in value:
                             splitvalue = value.split('，')[0]
                             table.cell(i, j+1).text = splitvalue
+
+                        elif table.cell(i, j).text == 'Framingham Risk Score':
+                            value = float(value)
+                            table.cell(i, j+1).text = str(int(value*100))+ '%'
+
                         else:
                             table.cell(i, j+1).text = value
-                        
+                        change_font_type(i, j+1)
+
                     # empty cell from 頸 ~ 左肩 and 左手 ~ 右腳踝
                     elif (i < 18 and j == 6) or (i < 19 and j == 9): 
                         table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                        change_font_type(i, j+1)
 
                     # empty cell
                     elif i == 18 and (j > 5 and j < 10):
                         table.cell(i, j).text = ''
-                    
+                
                 # row from I_score ~ I_risk   
                 elif (i >= 21 and i < 23) and (j == 0 or j == 2): 
                     table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                    change_font_type(i, j+1)
 
                 # row from 加班時數~異常工作負荷
                 elif i >= 23 and j == 1:
                     table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
-                
+                    change_font_type(i, j+1)
+
                 else:
                     pass
 
@@ -749,6 +769,6 @@ class excel_to_word_table:
 
 
 
-# if __name__ == '__main__':
-#     etwt = excel_to_word_table()
-#     etwt.run_convert()
+if __name__ == '__main__':
+    etwt = excel_to_word_table()
+    etwt.run_convert()
