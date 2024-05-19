@@ -502,7 +502,7 @@ class Excel_GUI:
     
 
     def linked_to_github(self):
-        url = 'https://github.com/Yi-Feng-Liu/Excel-Filter-Tool/tags'
+        url = 'https://github.com/Yi-Feng-Liu/Excel-Filter-Tool/releases'
         webbrowser.open(url)
 
 
@@ -546,7 +546,7 @@ class Excel_GUI:
         # clear text every time when who reselect save path
         self.show_save_dir_entry.delete(0, END)
         formatted_datetime_str = datetime.now().replace(second=0, microsecond=0).strftime('%Y%m%d%H%M')
-        self.show_save_dir_entry.insert(0, resource_path(savefilepath + f"{formatted_datetime_str}.zip"))
+        self.show_save_dir_entry.insert(0, resource_path(savefilepath + f"_{formatted_datetime_str}.zip"))
         self.check_savefilepath_entry()
 
 
