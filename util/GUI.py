@@ -515,7 +515,7 @@ class Excel_GUI:
         with zipfile.ZipFile(save_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for file in files:
                 arc_name = os.path.basename(file)
-                messagebox.showinfo(title="完成通知", message=arc_name)
+                # messagebox.showinfo(title="完成通知", message=arc_name)
                 zipf.write(file, arcname=arc_name)
                 os.remove(file)
 
@@ -544,9 +544,8 @@ class Excel_GUI:
         from datetime import datetime
         savefilepath = filedialog.asksaveasfilename(filetypes=[("壓縮檔", ".zip")])
         # clear text every time when who reselect save path
-        formatted_datetime_str = datetime.now().replace(second=0, microsecond=0).strftime('%Y%m%d%H%M')
         self.show_save_dir_entry.delete(0, END)
-        self.show_save_dir_entry.insert(0, resource_path(savefilepath + f"_{formatted_datetime_str}.zip"))
+        self.show_save_dir_entry.insert(0, resource_path(savefilepath + ".zip"))
         self.check_savefilepath_entry()
 
 
