@@ -653,10 +653,47 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 from docx.oxml.ns import qn  
 from docx.shared import Pt 
 
+class changeCell():
+    def __init__(self, table) -> None:
+        self.table = table
+
+    def __call__(self, index_x, index_y):
+        self.index_x = index_x
+        self.index_y = index_y
+        self.change()
+
+
+    def change_font_type(self):
+        fontname = 'Microsoft JhengHei'
+        run = self.table.cell(self.index_x, self.index_y).paragraphs[0].runs[0]
+        run.font.name = fontname
+        run.bold = True
+        run._element.rPr.rFonts.set(qn('w:eastAsia'), fontname)
+        run.font.size = Pt(11)
+
+
+    def changeCellHeight(self):
+        from docx.oxml import OxmlElement
+        row = self.table.cell(self.index_x, self.index_y)._element.getparent().getparent()
+        # 獲取或創建行屬性 (trPr)
+        if row.tag.endswith('tr'):
+            trPr = row.get_or_add_trPr()
+            # 創建行高度元素 (trHeight)
+            trHeight = OxmlElement('w:trHeight')
+            trHeight.set(qn('w:val'), "400")  # 設置行高 (單位：twips，1 twip = 1/20 點)
+            
+            # 將行高度元素添加到行屬性
+            trPr.append(trHeight)
+
+    def change(self):
+        self.change_font_type()
+        self.changeCellHeight()
+
+
 class excel_to_word_table:
     def __init__(self, excel_source='') -> None:
         self.excel_source = excel_source if excel_source != '' else self.resource_path('util\\sample.xlsx')
-        self.word_source = 'util\\template_word.docx'
+        self.word_source = 'util\\template_wordv3.docx'
         self.folder = 'documents\\'
 
         self.filename = self.excel_source.split('.')[0].split('/')[-1] + '.docx'
@@ -697,34 +734,37 @@ class excel_to_word_table:
             run.font.name = 'Microsoft JhengHei'
             run.bold = True
             run._element.rPr.rFonts.set(qn('w:eastAsia'), 'Microsoft JhengHei')
-            run.font.size = Pt(10)
+            run.font.size = Pt(11)
 
         # open Word
         doc = Document(self.resource_path(self.word_source))
         table = doc.tables[0]
+        CC = changeCell(table)
         for i, word_row in enumerate(table.rows):
             for j, _ in enumerate(word_row.cells):
                 # part of basic info
                 if (i >= 1 and i < 4) and (j == 1 or j == 7):
                     table.cell(i, j+2).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
-                    change_font_type(i, j+2)
-
-                # part of health summary
+                    CC(i, j+2)
+                                
+                # part of health summary ~ 頸~左手/手腕
                 elif i >= 6 and i <= 11:
-                    if (j==0 or j==2) or (i<11 and j==9) or (i==11 and (j==6 or j==9)): 
+                    if (j==0 or j==3) or (i<11 and j==9) or (i==11 and (j==6 or j==9)): 
                         if (i==10 or i==11) and (j==2 or j==3):
                             continue
                         table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
-                        change_font_type(i, j+1)
+                        CC(i, j+1)
+                        
 
-                # cell of context from 其他症狀
-                elif i == 22 and j == 4:
-                    table.cell(i, j).text = excel_dict.get(str(table.cell(i-1, j).text).strip(), '')
-                    change_font_type(i, j)
+                # row from 抽菸習慣~自覺症狀 & 頸~上背 左手~右臂
+                elif i >= 12 and i <= 14:
+                    if j == 0 or j == 6 or j == 9:
+                        table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                        CC(i, j+1)
 
-                # row from 抽菸習慣~三高族群分級
-                elif i >= 12 and i <= 20:
-                    if j == 1:
+                # row from 成人血壓~三高族群分級        
+                elif i > 14 and i <= 20:
+                    if j == 2:
                         value = excel_dict.get(str(table.cell(i, j).text).strip(), '')
                         if '，' in value:
                             splitvalue = value.split('，')[0]
@@ -736,26 +776,38 @@ class excel_to_word_table:
 
                         else:
                             table.cell(i, j+1).text = value
-                        change_font_type(i, j+1)
+                        CC(i, j+1)
 
-                    # empty cell from 頸 ~ 左肩 and 左手 ~ 右腳踝
+
+                    # empty cell from 下背 ~ 右手肘 and 左膝 ~ 右腳踝
                     elif (i < 18 and j == 6) or (i < 19 and j == 9): 
                         table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
-                        change_font_type(i, j+1)
+                        CC(i, j+1)
 
                     # empty cell
                     elif i == 18 and (j > 5 and j < 10):
                         table.cell(i, j).text = ''
-                
-                # row from I_score ~ I_risk   
-                elif (i >= 21 and i < 23) and (j == 0 or j == 2): 
-                    table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
-                    change_font_type(i, j+1)
 
-                # row from 加班時數~異常工作負荷
-                elif i >= 23 and j == 1:
+                # row from I_score ~ I_risk   
+                elif (i >= 21 and i < 23) and (j == 0 or j == 3): 
                     table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
-                    change_font_type(i, j+1)
+                    CC(i, j+1)
+
+
+                # row from 加班時數~心血管疾病
+                elif i >= 23 and i < 27 and j == 1:
+                    table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                    if table.cell(i, j).text == "心血管疾病風險：":
+                        table.cell(i, j+1).text = excel_dict.get("心血管疾病風險等級 ：", '')
+
+                # cell of context from 其他症狀
+                elif i == 27 and (j == 1 or j == 7):
+                    # row from 異常工作負荷 
+                    if j == 1:
+                        table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
+                    else:
+                        table.cell(i, j+1).text = excel_dict.get("其他症狀或病史說明")
+                    CC(i, j+1)
 
                 else:
                     pass
