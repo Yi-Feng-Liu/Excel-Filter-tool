@@ -743,13 +743,13 @@ class excel_to_word_table:
         for i, word_row in enumerate(table.rows):
             for j, _ in enumerate(word_row.cells):
                 # part of basic info
-                if (i >= 1 and i < 4) and (j == 1 or j == 7):
+                if (i >= 1 and i < 4) and (j == 1 or j == 6):
                     table.cell(i, j+2).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
                     CC(i, j+2)
                                 
                 # part of health summary ~ 頸~左手/手腕
                 elif i >= 6 and i <= 11:
-                    if (j==0 or j==3) or (i<11 and j==9) or (i==11 and (j==6 or j==9)): 
+                    if (j==0 or j==3) or (i<11 and j==8) or (i==11 and (j==6 or j==8)): 
                         if (i==10 or i==11) and (j==2 or j==3):
                             continue
                         table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
@@ -758,7 +758,7 @@ class excel_to_word_table:
 
                 # row from 抽菸習慣~自覺症狀 & 頸~上背 左手~右臂
                 elif i >= 12 and i <= 14:
-                    if j == 0 or j == 6 or j == 9:
+                    if j == 0 or j == 6 or j == 8:
                         table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
                         CC(i, j+1)
 
@@ -780,7 +780,7 @@ class excel_to_word_table:
 
 
                     # empty cell from 下背 ~ 右手肘 and 左膝 ~ 右腳踝
-                    elif (i < 18 and j == 6) or (i < 19 and j == 9): 
+                    elif (i < 18 and j == 6) or (i < 19 and j == 8): 
                         table.cell(i, j+1).text = excel_dict.get(str(table.cell(i, j).text).strip(), '')
                         CC(i, j+1)
 
