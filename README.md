@@ -1,4 +1,4 @@
-# Excel-Filter-Tool  (This tool is made for Lyra)
+# Excel-Filter-Tool
 
 
 ## version 1.0:
